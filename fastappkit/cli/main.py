@@ -16,12 +16,13 @@ app = typer.Typer(
     name="fastappkit",
     help="FastAppKit - A toolkit for building FastAPI projects with apps",
     add_completion=False,
-    invoke_without_command=True,
+    invoke_without_command=False,
 )
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main_callback(
+    ctx: typer.Context,
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose output"),
     debug: bool = typer.Option(False, "--debug", help="Enable debug output"),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress output"),
@@ -37,6 +38,11 @@ def main_callback(
     # Handle version flag (must be checked first)
     if version:
         typer.echo(f"fastappkit {__version__}")
+        raise typer.Exit(0)
+
+    # If no command was provided, show help
+    if ctx.invoked_subcommand is None:
+        typer.echo(ctx.get_help())
         raise typer.Exit(0)
 
     # Determine output level (default to VERBOSE)

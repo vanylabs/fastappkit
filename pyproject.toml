@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastappkit"
-version = "0.1.2"
+version = "0.1.3"
 description = "A toolkit for building FastAPI projects with apps - internal and external pluggable apps"
 authors = ["VanyLabs <desaiparth971@gmail.com>"]
 readme = "README.md"
@@ -20,6 +20,10 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
     "Framework :: FastAPI",
     "Typing :: Typed",
+]
+packages = [{include = "fastappkit"}]
+include = [
+    {path = "fastappkit/cli/templates", format = "sdist"}
 ]
 
 [tool.poetry.dependencies]
@@ -50,9 +54,3 @@ fastappkit = "fastappkit.cli.main:main"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.setuptools]
-packages = ["fastappkit"]
-
-[tool.setuptools.package-data]
-fastappkit = ["cli/templates/**/*"]
