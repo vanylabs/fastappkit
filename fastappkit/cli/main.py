@@ -16,11 +16,12 @@ app = typer.Typer(
     name="fastappkit",
     help="FastAppKit - A toolkit for building FastAPI projects with apps",
     add_completion=False,
-    invoke_without_command=False,
+    invoke_without_command=True,
+    rich_markup_mode=None,  # Disable Rich to avoid help formatting bug
 )
 
 
-@app.callback(invoke_without_command=True)
+@app.callback()
 def main_callback(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose output"),
     debug: bool = typer.Option(False, "--debug", help="Enable debug output"),
