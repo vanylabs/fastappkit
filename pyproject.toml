@@ -2,7 +2,7 @@
 name = "fastappkit"
 version = "0.1.1"
 description = "A toolkit for building FastAPI projects with apps - internal and external pluggable apps"
-authors = ["VanyLabs <https://github.com/vanylabs>"]
+authors = ["VanyLabs <desaiparth971@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 keywords = ["fastapi", "apps", "plugins", "migrations", "framework", "django-like", "modular", "alembic"]
