@@ -152,6 +152,26 @@ poetry version patch  # or minor/major
 
 ---
 
+## 🚀 PyPI Setup (One-Time)
+
+Set up PyPI Trusted Publishing to enable automatic publishing from GitHub Actions:
+
+1. **Go to:** https://pypi.org/manage/account/publishing/
+2. **Click:** "Add a new pending publisher"
+3. **Fill in:**
+    - PyPI project name: `fastappkit`
+    - Owner: `vanylabs`
+    - Repository name: `fastappkit`
+    - Workflow filename: `publish.yml`
+    - Environment name: `pypi`
+4. **Click:** "Add"
+
+**Optional:** Create GitHub environment `pypi` in Settings → Environments (auto-created if skipped).
+
+**Done!** The workflow is already configured. First publish activates the pending publisher.
+
+---
+
 ## 📋 Key Decisions
 
 -   **Branch Strategy:** Feature branches → `main` (no `develop` branch)
