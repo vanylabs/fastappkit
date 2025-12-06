@@ -164,7 +164,7 @@ def dev(
             if str(project_root) not in sys.path:
                 sys.path.insert(0, str(project_root))
 
-            from main import app as fastapi_app
+            from main import app as fastapi_app  # type: ignore[import-not-found]
 
             uvicorn.run(
                 fastapi_app,
