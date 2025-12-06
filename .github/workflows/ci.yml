@@ -85,7 +85,7 @@ jobs:
               run: poetry install --no-interaction
 
             - name: Check formatting with Black
-              run: poetry run black --check fastappkit tests
+              run: poetry run black --check --line-length=100 fastappkit tests
 
             - name: Run Ruff
               run: poetry run ruff check fastappkit tests

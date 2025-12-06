@@ -7,7 +7,7 @@
 
 **fastappkit** brings Django-like app architecture to FastAPI, enabling modular development with both project-specific internal apps and reusable external pluggable apps.
 
-## 🚀 What is fastappkit?
+## What is fastappkit?
 
 **fastappkit** is a toolkit for building FastAPI projects with a modular app architecture. It enables:
 
