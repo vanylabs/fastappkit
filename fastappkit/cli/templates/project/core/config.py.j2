@@ -1,0 +1,22 @@
+"""
+Settings configuration for {{ project_name }}.
+
+Uses pydantic-settings to load from .env file.
+"""
+
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    """
+    Application settings.
+
+    Loads from .env file automatically.
+    """
+
+    DATABASE_URL: str = "sqlite:///./{{ project_name }}.db"
+    DEBUG: bool = False
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"

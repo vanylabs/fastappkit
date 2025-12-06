@@ -1,0 +1,24 @@
+"""
+SQLAlchemy models for {{ app_name }} app.
+"""
+
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+
+# Use the shared Base from core if available, otherwise create one
+# from core.models import Base
+Base = declarative_base()
+
+
+class ExampleModel(Base):
+    """
+    Example model for {{ app_name }}.
+
+    Replace this with your actual models.
+    """
+
+    __tablename__ = "{{ app_name }}_example"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)

@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "{{ project_name }}"
+version = "0.1.0"
+description = "{{ project_description }}"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "*"
+fastappkit = "*"
+{% if use_poetry %}uvicorn = {extras = ["standard"], version = "*"}{% endif %}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+black = "*"
+ruff = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

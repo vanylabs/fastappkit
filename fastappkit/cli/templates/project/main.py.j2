@@ -1,0 +1,12 @@
+"""
+Main entry point for {{ project_name }}.
+
+Run with: uvicorn main:app --reload
+"""
+
+from core.app import app
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

@@ -1,0 +1,10 @@
+# FastAppKit manifest for {{ app_name }}
+# This file is included in the package and is available when installed via pip
+
+name = "{{ app_name }}"
+version = "0.1.0"
+entrypoint = "{{ app_name }}:register"
+# Migrations are inside the package directory (standard Python package structure)
+migrations = "migrations"
+models_module = "{{ app_name }}.models"
+route_prefix = "/{{ app_name }}"

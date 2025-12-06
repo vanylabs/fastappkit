@@ -1,0 +1,25 @@
+"""
+{{ app_name }} app - Internal app for {{ project_name }}.
+"""
+
+from fastapi import APIRouter, FastAPI
+
+from .router import router
+
+
+def register(app: FastAPI) -> APIRouter:
+    """
+    Register {{ app_name }} app with FastAPI application.
+
+    Args:
+        app: FastAPI application instance
+
+    Returns:
+        APIRouter: Router for this app
+    """
+    # You can also mount the router directly here if you prefer:
+    # app.include_router(router, prefix="/{{ app_name }}")
+    # return None
+
+    # Or return the router and let fastappkit mount it with prefix:
+    return router

@@ -1,0 +1,12 @@
+"""
+Application factory for {{ project_name }}.
+"""
+
+from core.config import Settings
+from fastappkit.core.kit import FastAppKit
+
+# Initialize FastAppKit with project's Settings
+# This sets settings globally via set_settings() in FastAppKit.__init__
+settings = Settings()
+kit = FastAppKit(settings=settings)
+app = kit.create_app()

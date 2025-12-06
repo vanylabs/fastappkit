@@ -1,0 +1,21 @@
+"""
+FastAPI router for {{ app_name }} app.
+"""
+
+from fastapi import APIRouter
+
+router = APIRouter(
+    tags=["{{ app_name }}"],
+)
+
+
+@router.get("/")
+async def root():
+    """Root endpoint for {{ app_name }} app."""
+    return {"app": "{{ app_name }}", "message": "Hello from {{ app_name }}!"}
+
+
+@router.get("/health")
+async def health():
+    """Health check endpoint."""
+    return {"status": "ok"}

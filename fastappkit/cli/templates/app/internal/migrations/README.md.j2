@@ -1,0 +1,25 @@
+# {{ app_name }} Migrations
+
+This directory contains Alembic migrations for the {{ app_name }} app.
+
+## Usage
+
+Generate a new migration:
+```bash
+fastappkit migrate app {{ app_name }} makemigrations -m "description"
+```
+
+Apply migrations:
+```bash
+fastappkit migrate app {{ app_name }} upgrade
+```
+
+Preview SQL:
+```bash
+fastappkit migrate app {{ app_name }} preview
+```
+
+## Note
+
+Internal apps use the shared `alembic_version` table by default.
+Migrations are part of the project-wide schema timeline.

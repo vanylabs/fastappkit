@@ -1,0 +1,73 @@
+# {{ app_name }}
+
+External pluggable app for fastappkit.
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+## Usage
+
+Add to your `fastappkit.toml`:
+
+```toml
+[tool.fastappkit]
+apps = [
+    "{{ app_name }}",
+]
+```
+
+## Migrations
+
+This app uses isolated migrations with its own version table (`alembic_version_{{ app_name }}`).
+
+**Important**: External apps are developed independently. Migrations are created in the external app's own project, not from the core project.
+
+### When Developing the External App
+
+The external app includes an `alembic.ini` file for independent development.
+
+**Create migrations** (in the external app's project directory):
+```bash
+# In the external app's project directory
+cd {{ app_name }}
+
+# Create a new migration
+alembic revision --autogenerate -m "description"
+
+# Or create an empty migration
+alembic revision -m "description"
+```
+
+**Run migrations** (in the external app's project directory):
+```bash
+# Upgrade to latest
+alembic upgrade head
+
+# Downgrade one revision
+alembic downgrade -1
+
+# Preview SQL without executing
+alembic upgrade head --sql
+```
+
+**Database URL**: Set `DATABASE_URL` environment variable, or edit `alembic.ini` to configure your database.
+
+### When Using the External App in a Core Project
+
+Apply existing migrations (from core project):
+```bash
+fastappkit migrate app {{ app_name }} upgrade
+```
+
+**Note**: You cannot create migrations for external apps from the core project. Migrations must be created when developing the external app itself.
+
+## Development
+
+This is an external app, which means:
+- It must be schema-independent
+- It cannot depend on internal apps
+- It uses its own migration timeline
+- It can be published to PyPI

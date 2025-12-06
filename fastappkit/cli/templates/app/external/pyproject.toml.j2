@@ -1,0 +1,23 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "{{ app_name }}"
+version = "0.1.0"
+description = "{{ app_description }}"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+license = "MIT"
+# For nested package structure: {{ app_name }}/{{ app_name }}/__init__.py
+# Poetry will auto-detect the nested package structure when 'from' is omitted
+packages = [{include = "{{ app_name }}"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "*"
+sqlalchemy = "*"
+alembic = "*"
+
+# Note: FastAppKit metadata is in {{ app_name }}/fastappkit.toml
+# This file is included in the package when published to PyPI

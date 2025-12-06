@@ -1,0 +1,21 @@
+"""
+{{ app_name }} - External pluggable app for fastappkit.
+"""
+
+from fastapi import APIRouter, FastAPI
+
+from {{ app_name }}.router import router
+
+
+def register(app: FastAPI) -> APIRouter:
+    """
+    Register {{ app_name }} app with FastAPI application.
+
+    Args:
+        app: FastAPI application instance
+
+    Returns:
+        APIRouter: Router for this app
+    """
+    # External apps should return router for fastappkit to mount
+    return router
