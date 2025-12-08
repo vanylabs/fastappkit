@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastappkit"
-version = "0.1.5"
+version = "0.1.6"
 description = "A toolkit for building FastAPI projects with apps - internal and external pluggable apps"
 authors = ["VanyLabs <desaiparth971@gmail.com>"]
 readme = "README.md"
@@ -28,15 +28,15 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.11.6"
-fastapi = ">=0.104.0,<0.116.0"
-sqlalchemy = ">=2.0.0,<2.1.0"
-alembic = ">=1.12.0,<1.14.0"
-pydantic-settings = ">=2.0.0,<3.0.0"
-typer = ">=0.9.0,<0.13.0"
-jinja2 = ">=3.1.0,<4.0.0"
-uvicorn = {extras = ["standard"], version = ">=0.24.0,<0.32.0"}
-rich = ">=13.0.0,<14.0.0"
-tomlkit = ">=0.12.0,<0.13.0"
+fastapi = ">=0.120.0,<0.130"
+sqlalchemy = ">=2.0,<3.0"
+alembic = ">=1.17.2,<1.18"
+pydantic = ">=2.0,<3.0"
+typer = ">=0.20.0,<0.21"
+jinja2 = ">=3.1.6,<4.0"
+uvicorn = {extras = ["standard"], version = ">=0.38.0,<0.39"}
+rich = ">=14.0.0,<15.0"
+tomlkit = ">=0.13.3,<0.14"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

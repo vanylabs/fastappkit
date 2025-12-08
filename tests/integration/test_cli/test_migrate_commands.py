@@ -147,15 +147,16 @@ class TestMigrateCoreCommand:
 
         try:
             os.chdir(temp_project)
+            # ProjectFactory.create_minimal now uses actual templates to create
+            # core/config.py, core/app.py, env.py, script.py.mako (same as 'core new')
             ProjectFactory.create_minimal(temp_project)
 
-            # Create core models for migration
+            # Create core/models.py for migration (this is optional, not created by core new)
             core_models = temp_project / "core" / "models.py"
-            core_models.parent.mkdir(parents=True, exist_ok=True)
             core_models.write_text(
                 '''"""Core models."""
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -261,6 +262,8 @@ class TestMigrateAppCommand:
 
         try:
             os.chdir(temp_project)
+            # ProjectFactory.create_with_apps uses create_minimal which creates
+            # all required files using actual templates (same as 'core new')
             ProjectFactory.create_with_apps(temp_project, "blog")
             # Create app with models
             InternalAppFactory.create(temp_project, "blog", with_models=True, with_migrations=False)

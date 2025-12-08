@@ -63,7 +63,7 @@ def register(app: FastAPI):
         """Generate models.py code."""
         return '''"""Test models."""
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 

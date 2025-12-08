@@ -135,6 +135,10 @@ def test_kit_creation(settings):
 We aim for **70-80% minimum** test coverage. Check coverage with:
 
 ```bash
+poetry run pytest --cov=fastappkit
+
+OR
+
 poetry run pytest --cov=fastappkit --cov-report=html
 open htmlcov/index.html  # View coverage report
 ```

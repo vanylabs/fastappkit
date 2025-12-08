@@ -206,4 +206,4 @@ logs/
 .black_cache/
 
 # Documentation (internal tracking)
-docs/Checklist.md
+docs/temp/

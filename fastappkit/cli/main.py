@@ -1,46 +1,45 @@
 """
 Main CLI entry point for fastappkit.
-
-Uses Typer for command-line interface.
 """
 
 from __future__ import annotations
-
 import typer
-
 from fastappkit import __version__
+from fastappkit.cli import core, app as app_commands, migrate
 from fastappkit.cli.output import Output, OutputLevel, set_output
 from fastappkit.utils.logging import setup_logging_from_output_level
 
 app = typer.Typer(
     name="fastappkit",
     help="FastAppKit - A toolkit for building FastAPI projects with apps",
-    add_completion=False,
-    invoke_without_command=True,
-    rich_markup_mode=None,  # Disable Rich to avoid help formatting bug
+    invoke_without_command=True,  # allows running CLI with no subcommand
 )
 
 
+def _version_callback(value: bool) -> None:
+    if value:
+        print(f"fastappkit {__version__}")
+        raise typer.Exit()
+
+
+# ------------------------
+# Global options (verbose/debug/quiet)
+# ------------------------
 @app.callback()
 def main_callback(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose output"),
     debug: bool = typer.Option(False, "--debug", help="Enable debug output"),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress output"),
     version: bool = typer.Option(
-        False, "--version", "-V", help="Show version and exit", is_eager=True
+        None,
+        "--version",
+        "-V",
+        help="Show fastappkit version",
+        # is_eager=True,
+        callback=_version_callback,
     ),
 ) -> None:
-    """
-    FastAppKit - A toolkit for building FastAPI projects with apps.
-
-    Supports both internal apps (project-specific) and external apps (pluggable packages).
-    """
-    # Handle version flag (must be checked first)
-    if version:
-        typer.echo(f"fastappkit {__version__}")
-        raise typer.Exit(0)
-
-    # Determine output level (default to VERBOSE)
+    # Set global logging/output level
     if quiet:
         level = OutputLevel.QUIET
     elif debug:
@@ -48,32 +47,24 @@ def main_callback(
     elif verbose:
         level = OutputLevel.VERBOSE
     else:
-        level = OutputLevel.VERBOSE  # Default to verbose instead of normal
+        level = OutputLevel.VERBOSE
 
-    # Set global output level
     set_output(Output(level=level))
-
-    # Setup logging based on output level
     setup_logging_from_output_level(level)
 
 
-@app.command()
-def version() -> None:
-    """Show fastappkit version."""
-    typer.echo(f"fastappkit {__version__}")
-
-
-# Import command groups (after app creation to avoid circular imports)
-from fastappkit.cli import app as app_commands, core, migrate  # noqa: E402
-
-# Register command groups
+# ------------------------
+# Add subcommands
+# ------------------------
 app.add_typer(core.app, name="core")
 app.add_typer(app_commands.app, name="app")
 app.add_typer(migrate.app, name="migrate")
 
 
+# ------------------------
+# Entry point
+# ------------------------
 def main() -> None:
-    """Main entry point for fastappkit CLI."""
     app()
 
 

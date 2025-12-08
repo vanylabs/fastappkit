@@ -902,12 +902,12 @@ All commands support:
 -   `--quiet, -q`: Suppress output
 -   `--version, -V`: Show version and exit (global flag)
 
-**Version Command:**
+**Show Version:**
 
 ```bash
-fastappkit version
-# Or use global flag:
 fastappkit --version
+# Or use short form:
+fastappkit -V
 ```
 
 Shows the installed fastappkit version.
