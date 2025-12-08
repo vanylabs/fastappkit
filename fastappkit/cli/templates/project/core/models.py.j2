@@ -1,0 +1,38 @@
+"""
+SQLAlchemy models for {{ project_name }} core.
+
+Core models are for shared infrastructure tables (sessions, logs, queues, etc.)
+that are used across the entire project, not app-specific features.
+Use internal apps for app-specific features.
+"""
+
+from sqlalchemy.orm import DeclarativeBase
+
+
+class Base(DeclarativeBase):
+    """
+    Base class for all SQLAlchemy models in this project.
+
+    Internal apps should import this Base:
+        from core.models import Base
+    """
+
+    pass
+
+
+# Example model (commented out - uncomment and modify as needed):
+# from sqlalchemy import Column, Integer, String, DateTime
+# from datetime import datetime
+#
+# class ExampleModel(Base):
+#     """
+#     Example core model for shared infrastructure.
+#
+#     Replace this with your actual core models.
+#     """
+#
+#     __tablename__ = "example"
+#
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String, nullable=False)
+#     created_at = Column(DateTime, default=datetime.utcnow)

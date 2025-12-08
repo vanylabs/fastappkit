@@ -51,10 +51,12 @@ cd myproject
 
 This creates a complete FastAPI project structure with:
 
--   Core application setup
+-   Core application setup (including `core/models.py` with SQLAlchemy Base class)
 -   Database configuration
 -   Migration system
 -   App directory structure
+
+**Note:** Dependency versions in `pyproject.toml` are set to `*` by default. Update them according to your needs, especially for production deployments.
 
 ### 2. Create an internal app
 
@@ -97,6 +99,11 @@ fastappkit app new blog
 # Creates apps/blog/ with models, router, etc.
 ```
 
+**Key points:**
+
+-   Internal apps import `Base` from `core.models` for SQLAlchemy models
+-   The `register()` function can return `Optional[APIRouter]` - return a router for fastappkit to mount, or mount it yourself and return `None`
+
 ### External Apps
 
 External apps are reusable packages that can be installed via pip and plugged into any fastappkit project.
@@ -105,6 +112,12 @@ External apps are reusable packages that can be installed via pip and plugged in
 fastappkit app new payments --as-package
 # Creates a standalone package structure
 ```
+
+**Key points:**
+
+-   External apps must use their own `Base` class (isolated metadata) - cannot import from core
+-   The `register()` function can return `Optional[APIRouter]` - return a router for fastappkit to mount, or mount it yourself and return `None`
+-   External apps must have `fastappkit.toml` manifest in the package directory
 
 ### Migrations
 
@@ -147,11 +160,14 @@ fastappkit app validate <name>       # Validate an app
 
 ```bash
 fastappkit migrate core -m "message"           # Create core migration
-fastappkit migrate app <name> makemigrations   # Create app migration
-fastappkit migrate app <name> upgrade         # Upgrade app migrations
-fastappkit migrate app <name> downgrade -r <rev>  # Downgrade app migrations
+fastappkit migrate app <name> makemigrations -m "message"  # Create app migration (internal only)
+fastappkit migrate app <name> upgrade [--revision <rev>]  # Upgrade app migrations (external only)
+fastappkit migrate app <name> downgrade --revision <rev>  # Downgrade app migrations (external only, --revision required)
+fastappkit migrate app <name> preview [--revision <rev>]  # Preview SQL for app migrations (external only)
 fastappkit migrate all                        # Run all migrations
-fastappkit migrate preview                    # Preview SQL for all migrations
+fastappkit migrate preview [--revision <rev>]  # Preview SQL for core + internal app migrations
+fastappkit migrate upgrade [--revision <rev>]  # Upgrade core + internal app migrations
+fastappkit migrate downgrade <rev>            # Downgrade core + internal app migrations (<rev> required)
 ```
 
 ## 📖 Example Project Structure
@@ -160,12 +176,13 @@ fastappkit migrate preview                    # Preview SQL for all migrations
 myproject/
 ├── core/
 │   ├── config.py          # Settings (loads from .env)
+│   ├── models.py          # SQLAlchemy Base class (DeclarativeBase)
 │   ├── app.py             # create_app() factory
 │   └── db/
 │       └── migrations/    # Core migrations
 ├── apps/                   # Internal apps directory
 │   └── blog/
-│       ├── models.py
+│       ├── models.py       # Imports Base from core.models
 │       └── router.py
 ├── fastappkit.toml        # Project configuration
 ├── .env                   # Environment variables

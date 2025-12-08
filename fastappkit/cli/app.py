@@ -207,6 +207,15 @@ def new(
             output.info("  pip install -e .  # Install the package")
             output.info(f"  # Add '{name}' to fastappkit.toml apps list")
             output.info(f"  fastappkit migrate app {name} makemigrations")
+            output.warning(
+                "\n⚠️  Note: Dependency versions in pyproject.toml are set to '*' (any version)."
+            )
+            output.warning(
+                "   Update them according to your needs, especially for production deployments."
+            )
+            output.warning(
+                "   Recommended: Match versions with the core project for compatibility."
+            )
         else:
             output.info("\nNext steps:")
             output.info(f"  # App '{app_entry}' has been added to fastappkit.toml")
