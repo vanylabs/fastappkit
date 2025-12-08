@@ -5,22 +5,31 @@ External apps must use isolated metadata - do not import from other apps.
 """
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 
 # External apps use their own Base (isolated metadata)
-Base = declarative_base()
-
-
-class ExampleModel(Base):
+class Base(DeclarativeBase):
     """
-    Example model for {{ app_name }}.
+    Base class for all SQLAlchemy models in this external app.
 
-    Replace this with your actual models.
-    Note: External apps cannot reference models from other apps.
+    External apps must use their own Base class for isolation.
+    Do not import Base from core or other apps.
     """
 
-    __tablename__ = "{{ app_name }}_example"
+    pass
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    description = Column(String, nullable=True)
+
+# Example model (commented out - uncomment and modify as needed):
+# class ExampleModel(Base):
+#     """
+#     Example model for {{ app_name }}.
+#
+#     Replace this with your actual models.
+#     Note: External apps cannot reference models from other apps.
+#     """
+#
+#     __tablename__ = "{{ app_name }}_example"
+#
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String, nullable=False)
+#     description = Column(String, nullable=True)

@@ -67,6 +67,7 @@ def new(
         templates = [
             ("project/core/__init__.py.j2", "core/__init__.py"),
             ("project/core/config.py.j2", "core/config.py"),
+            ("project/core/models.py.j2", "core/models.py"),
             ("project/core/app.py.j2", "core/app.py"),
             ("project/core/db/__init__.py.j2", "core/db/__init__.py"),
             ("project/core/db/migrations/env.py.j2", "core/db/migrations/env.py"),
@@ -103,6 +104,15 @@ def new(
         output.info("  poetry install  # or: pip install -e .")
         output.info("  fastappkit migrate all")
         output.info("  fastappkit core dev")
+        output.warning(
+            "\n⚠️  Note: Dependency versions in pyproject.toml are set to '*' (any version)."
+        )
+        output.warning(
+            "   Update them according to your needs, especially for production deployments."
+        )
+        output.warning(
+            "   Recommended: Use specific version ranges (e.g., '>=0.120.0,<0.130') for stability."
+        )
 
     except Exception as e:
         output.error(f"Failed to create project: {e}")

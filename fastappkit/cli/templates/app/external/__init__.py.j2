@@ -2,20 +2,43 @@
 {{ app_name }} - External pluggable app for fastappkit.
 """
 
+from typing import Optional
+
 from fastapi import APIRouter, FastAPI
 
 from {{ app_name }}.router import router
 
 
-def register(app: FastAPI) -> APIRouter:
+def register(app: FastAPI) -> Optional[APIRouter]:
     """
     Register {{ app_name }} app with FastAPI application.
+
+    This function supports two patterns:
+
+    Pattern 1: Return router (recommended)
+        Return an APIRouter and fastappkit will mount it with the prefix
+        from the manifest (route_prefix) or default /<appname>.
+
+        Example:
+            return router
+
+    Pattern 2: Mount router yourself
+        Mount the router directly in this function and return None.
+        This gives you full control over prefix, tags, dependencies, etc.
+
+        Example:
+            app.include_router(router, prefix="/{{ app_name }}", tags=["{{ app_name }}"])
+            return None
 
     Args:
         app: FastAPI application instance
 
     Returns:
-        APIRouter: Router for this app
+        APIRouter if returning router for fastappkit to mount, None if mounting yourself
     """
-    # External apps should return router for fastappkit to mount
+    # Pattern 1: Return router - fastappkit will mount it with prefix from manifest
     return router
+
+    # Pattern 2: Mount router yourself (uncomment to use):
+    # app.include_router(router, prefix="/{{ app_name }}")
+    # return None

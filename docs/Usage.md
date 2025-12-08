@@ -422,7 +422,7 @@ The resolver tries methods in this order:
 ### Listing Apps
 
 ```bash
-fastappkit app list [--project-root <path>] [--verbose] [--debug] [--quiet]
+fastappkit app list [--verbose] [--debug] [--quiet]
 ```
 
 **Options:**
@@ -449,7 +449,7 @@ Shows all apps (internal and external) with:
 ### Validating Apps
 
 ```bash
-fastappkit app validate <name> [--project-root <path>] [--json]
+fastappkit app validate <name> [--json]
 ```
 
 **Options:**
@@ -496,7 +496,7 @@ fastappkit uses a **unified migration runner** that handles:
 
 ```bash
 # Generate migration (for core models)
-fastappkit migrate core -m "message" [--project-root <path>]
+fastappkit migrate core -m "message"
 ```
 
 **Options:**
@@ -555,7 +555,7 @@ The migration system looks for core models in `core/models.py`:
 
 ```bash
 # Generate migration (creates in core/db/migrations/versions/)
-fastappkit migrate app <name> makemigrations -m "message" [--project-root <path>]
+fastappkit migrate app <name> makemigrations -m "message"
 ```
 
 **Options:**
@@ -751,17 +751,32 @@ Settings are defined in `core/config.py` using Pydantic's `BaseSettings`:
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    # Database configuration
+    """
+    Application settings.
+
+    Loads from .env file automatically.
+    """
+
     DATABASE_URL: str = "sqlite:///./app.db"
-
-    # Application settings
     DEBUG: bool = False
-    SECRET_KEY: str = "change-me-in-production"
 
-    # Server settings (for dev server)
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8"
+    )
+```
+
+**Note:** The scaffolded code includes minimal settings. You can extend it by adding more fields as needed:
+
+```python
+class Settings(BaseSettings):
+    DATABASE_URL: str = "sqlite:///./app.db"
+    DEBUG: bool = False
+
+    # Add your custom settings here
+    SECRET_KEY: str = "change-me-in-production"
     HOST: str = "127.0.0.1"
     PORT: int = 8000
-    RELOAD: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -793,7 +808,7 @@ from fastappkit.conf import get_settings
 from fastapi import Depends
 
 def handler(settings: Settings = Depends(get_settings)):
-    return settings.debug
+    return settings.DEBUG
 ```
 
 **Environment Variables:**
@@ -803,8 +818,9 @@ The `.env` file is auto-scaffolded and automatically loaded:
 ```bash
 DATABASE_URL=sqlite:///./myproject.db
 DEBUG=false
-SECRET_KEY=your-secret-key-here
 ```
+
+You can add additional environment variables as needed for your custom settings.
 
 **Settings Initialization:**
 
@@ -914,10 +930,10 @@ Shows the installed fastappkit version.
 
 ### Project Commands
 
-| Command                      | Description            | Options                                                                             |
-| ---------------------------- | ---------------------- | ----------------------------------------------------------------------------------- |
-| `fastappkit core new <name>` | Create new project     | `--project-root`, `--description`                                                   |
-| `fastappkit core dev`        | Run development server | `--host`, `--port`, `--reload`, `--project-root`, `--verbose`, `--debug`, `--quiet` |
+| Command                      | Description            | Options                                                           |
+| ---------------------------- | ---------------------- | ----------------------------------------------------------------- |
+| `fastappkit core new <name>` | Create new project     | `--project-root`, `--description`                                 |
+| `fastappkit core dev`        | Run development server | `--host`, `--port`, `--reload`, `--verbose`, `--debug`, `--quiet` |
 
 ### App Commands
 
@@ -1276,10 +1292,19 @@ CORE MIGRATIONS     APP MIGRATIONS
     from pydantic_settings import BaseSettings, SettingsConfigDict
 
     class Settings(BaseSettings):
+        """
+        Application settings.
+
+        Loads from .env file automatically.
+        """
+
         DATABASE_URL: str = "sqlite:///./app.db"
         DEBUG: bool = False
 
-        model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+        model_config = SettingsConfigDict(
+            env_file=".env",
+            env_file_encoding="utf-8"
+        )
     ```
 
 2. **Settings Initialization** (in `core/app.py`):
@@ -1326,6 +1351,35 @@ CORE MIGRATIONS     APP MIGRATIONS
 -   **Environment-Specific:** Use different `.env` files per environment
 -   **Override Programmatically:** Pass `Settings` instance to `create_app(settings=...)`
 -   **Thread-Safe:** Settings are stored in thread-safe singleton
+
+### Dependency Versions
+
+**Important:** When creating a new project or external app, dependency versions in `pyproject.toml` are set to `*` (any version) by default. This provides maximum flexibility but may lead to compatibility issues.
+
+**Recommendations:**
+
+1. **For Production Projects:**
+
+    - Update dependency versions to specific ranges (e.g., `>=0.120.0,<0.130`)
+    - Pin exact versions for critical dependencies
+    - Test thoroughly after updating versions
+
+2. **For External Apps:**
+
+    - Match dependency versions with the core project for compatibility
+    - Use compatible version ranges that work with the core project's versions
+    - Document minimum required versions in your app's README
+
+3. **Example:**
+    ```toml
+    [tool.poetry.dependencies]
+    python = "^3.11"
+    fastapi = ">=0.120.0,<0.130"  # Specific range instead of *
+    sqlalchemy = ">=2.0,<3.0"
+    alembic = ">=1.17.2,<1.18"
+    ```
+
+**Note:** The CLI will display a warning message when creating projects or external apps, reminding you to update dependency versions according to your needs.
 
 ---
 
