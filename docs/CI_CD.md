@@ -73,7 +73,6 @@ main (production-ready)
 
 -   `pyproject.toml` - Updated via `poetry version`
 -   `fastappkit/__init__.py` - Manual update to match
--   `README.md` - Update version badge (line 4)
 -   `docs/changelog/X.X.X.md` - Create new changelog file
 -   `CHANGELOG.md` (repo root) - Add version to Version History
 -   `mkdocs.yml` - Add version to Changelog navigation
@@ -84,7 +83,6 @@ main (production-ready)
 ```bash
 poetry version patch  # or minor/major
 # Manually update fastappkit/__init__.py to match
-# Manually update README.md version badge to match
 # Create docs/changelog/X.X.X.md
 # Update CHANGELOG.md (repo root)
 # Update mkdocs.yml navigation
@@ -116,14 +114,7 @@ poetry version patch  # or minor/major
     # Update __version__ = "0.1.1" to match pyproject.toml
     ```
 
-4. **Update version badge in `README.md`**
-
-    ```bash
-    # Update the version badge on line 4:
-    # [![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](https://github.com/vanylabs/fastappkit/releases)
-    ```
-
-5. **Create changelog entry**
+4. **Create changelog entry**
 
     Create the changelog entry and update all references:
 
@@ -155,22 +146,22 @@ poetry version patch  # or minor/major
     # -   [Version 0.1.1](changelog/0.1.1.md) - Brief description
     ```
 
-6. **Commit changes**
+5. **Commit changes**
 
     ```bash
-    git add pyproject.toml fastappkit/__init__.py README.md \
+    git add pyproject.toml fastappkit/__init__.py \
             docs/changelog/ CHANGELOG.md mkdocs.yml docs/community/index.md
     git commit -m "chore: prepare release v0.1.1"
     ```
 
-7. **Create and push tag**
+6. **Create and push tag**
 
     ```bash
     git tag -a v0.1.1 -m "Release v0.1.1"
     git push origin main --tags
     ```
 
-8. **GitHub Action automatically:**
+7. **GitHub Action automatically:**
     - Detects tag
     - Builds package
     - Publishes to PyPI

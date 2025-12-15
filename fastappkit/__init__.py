@@ -6,7 +6,7 @@ Similar to Django apps, but supporting both internal and external pluggable apps
 
 from __future__ import annotations
 
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 
 from fastappkit.conf import SettingsProtocol, get_settings
 from fastappkit.core.kit import FastAppKit

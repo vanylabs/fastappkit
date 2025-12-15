@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastappkit"
-version = "0.1.9"
+version = "0.1.10"
 description = "A toolkit for building FastAPI projects with apps - internal and external pluggable apps"
 authors = ["VanyLabs <desaiparth971@gmail.com>"]
 readme = "README.md"

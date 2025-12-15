@@ -1,7 +1,6 @@
 # fastappkit
 
 [![PyPI version](https://img.shields.io/pypi/v/fastappkit.svg)](https://pypi.org/project/fastappkit/)
-[![Version](https://img.shields.io/badge/version-0.1.9-blue.svg)](https://github.com/vanylabs/fastappkit/releases)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/vanylabs/fastappkit/blob/main/LICENSE)
 
