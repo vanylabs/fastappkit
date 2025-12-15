@@ -1,0 +1,90 @@
+site_name: fastappkit
+site_description: A toolkit for building FastAPI projects with apps — internal and external pluggable apps
+site_url: https://fastappkit.readthedocs.io/
+site_author: VanyLabs
+
+# Repository
+repo_name: vanylabs/fastappkit
+repo_url: https://github.com/vanylabs/fastappkit
+edit_uri: edit/main/docs/
+
+# Copyright
+copyright: Copyright &copy; 2025 VanyLabs
+
+# Theme
+theme:
+    name: material
+    palette:
+        # Light mode
+        - scheme: default
+          primary: indigo
+          accent: indigo
+          toggle:
+              icon: material/brightness-7
+              name: Switch to dark mode
+        # Dark mode
+        - scheme: slate
+          primary: indigo
+          accent: indigo
+          toggle:
+              icon: material/brightness-4
+              name: Switch to light mode
+    features:
+        - navigation.tabs
+        - navigation.sections
+        - navigation.expand
+        - navigation.top
+        - search.suggest
+        - search.highlight
+        - content.code.annotate
+        - content.code.copy
+        - content.code.copy_button
+    icon:
+        repo: fontawesome/brands/github
+
+# Plugins
+plugins:
+    - search:
+          lang: en
+    - git-revision-date-localized:
+          enable_creation_date: true
+          type: date
+
+# Markdown extensions
+markdown_extensions:
+    - pymdownx.highlight:
+          anchor_linenums: true
+          line_spans: __span
+          pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+          alternate_style: true
+    - pymdownx.tasklist:
+          custom_checkbox: true
+    - admonition
+    - attr_list
+    - md_in_html
+    - toc:
+          permalink: true
+          toc_depth: 3
+
+# Navigation
+nav:
+    - Home: index.md
+    - Usage Guide: Usage.md
+    - CI/CD: CI_CD.md
+    - Contributing: CONTRIBUTING.md
+    - Security: SECURITY.md
+    - Changelog:
+          - Overview: CHANGELOG.md
+          - Version 0.1.0: changelog/0.1.0.md
+
+# Extra
+extra:
+    social:
+        - icon: fontawesome/brands/github
+          link: https://github.com/vanylabs/fastappkit
+    version:
+        provider: mike

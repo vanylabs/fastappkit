@@ -153,21 +153,21 @@ myproject/
                 │
                 ▼
        ┌────────────────┐
-       │ Read config     │  from fastappkit.toml
+       │ Read config    │  from fastappkit.toml
        └────────────────┘
                 │
                 ▼
       ┌───────────────────┐
-      │ Discover apps      │
-      │ - internal dirs    │
-      │ - pip pkgs         │
+      │ Discover apps     │
+      │ - internal dirs   │
+      │ - pip pkgs        │
       └───────────────────┘
                 │
                 ▼
-      ┌───────────────────┐
+      ┌────────────────────┐
       │ Validate manifests │
       │ + isolation rules  │
-      └───────────────────┘
+      └────────────────────┘
                 │
                 ▼
       ┌──────────────────────────┐
@@ -974,33 +974,33 @@ Shows the installed fastappkit version.
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│                           fastappkit                           │
-│                     (Framework + CLI + Runtime)                │
+│                           fastappkit                          │
+│                     (Framework + CLI + Runtime)               │
 └───────────────────────────────────────────────────────────────┘
                 │                       │
                 │                       │
      ┌──────────▼──────────┐   ┌────────▼──────────┐
-     │     Developer        │   │   fastappkit CLI  │
-     │   (project author)   │   │ (codegen + mgmt)  │
+     │     Developer       │   │   fastappkit CLI  │
+     │   (project author)  │   │ (codegen + mgmt)  │
      └──────────┬──────────┘   └────────┬──────────┘
                 │                       │
                 ▼                       ▼
-      ┌──────────────────┐     ┌──────────────────┐
+      ┌───────────────────┐     ┌───────────────────┐
       │ Internal Apps     │     │ External Apps     │
       │ ./apps/<name>     │     │ pip-installed     │
       │ shared timeline   │     │ isolated timeline │
-      └──────────┬────────┘     └────────┬─────────┘
+      └──────────┬────────┘     └─────────┬─────────┘
                  │                        │
                  ▼                        ▼
-          ┌─────────────┐         ┌─────────────┐
-          │   FastAPI    │         │  Alembic     │
-          │   router     │         │  per-app env │
+          ┌─────────────┐         ┌──────────────┐
+          │   FastAPI   │         │  Alembic     │
+          │   router    │         │  per-app env │
           └──────┬──────┘         └──────┬───────┘
-                 │                        │
+                 │                       │
                  └──────────┬────────────┘
                             ▼
                 ┌──────────────────────────┐
-                │      Runtime Engine       │
+                │      Runtime Engine      │
                 │ (loader + registry + db) │
                 └──────────────────────────┘
 ```
@@ -1049,15 +1049,15 @@ Error details include:
 **Router Mounting Architecture:**
 
 ```
-┌───────────────────── FastAPI app ──────────────────────┐
+┌───────────────────── FastAPI app ───────────────────────┐
 │                                                         │
 │   /core/...                                             │
 │                                                         │
 │   /blog/...              <-- internal apps              │
-│   /account/...                                           │
+│   /account/...                                          │
 │                                                         │
 │   /fastapi_blog/...      <-- external apps              │
-│   /fastapi_store/...                                      │
+│   /fastapi_store/...                                    │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```

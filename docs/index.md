@@ -84,20 +84,15 @@ Your FastAPI application is now running at `http://127.0.0.1:8000`!
 
 ## 📚 Documentation
 
-Comprehensive documentation is available at [Read the Docs](https://fastappkit.readthedocs.io/).
-
-For detailed usage instructions, see [docs/Usage.md](docs/Usage.md) or visit the [full documentation](https://fastappkit.readthedocs.io/).
+-   **[Usage Guide](Usage.md)** - Complete usage guide with examples
+-   **[CI/CD Guide](CI_CD.md)** - CI/CD workflows and release process
+-   **[Contributing](CONTRIBUTING.md)** - How to contribute to fastappkit
 
 ## 🎯 Core Concepts
 
 ### Internal Apps
 
 Internal apps are project-specific modules that live in your project's `apps/` directory. They share the same migration system and database connection.
-
-```bash
-fastappkit app new blog
-# Creates apps/blog/ with models, router, etc.
-```
 
 **Key points:**
 
@@ -107,11 +102,6 @@ fastappkit app new blog
 ### External Apps
 
 External apps are reusable packages that can be installed via pip and plugged into any fastappkit project.
-
-```bash
-fastappkit app new payments --as-package
-# Creates a standalone package structure
-```
 
 **Key points:**
 
@@ -126,17 +116,6 @@ fastappkit provides unified migration management:
 -   **Core migrations**: Project-level schema changes
 -   **Internal app migrations**: Shared migration directory for all internal apps
 -   **External app migrations**: Isolated migrations per external app
-
-```bash
-# Create migrations for an internal app
-fastappkit migrate app blog makemigrations -m "Add post model"
-
-# Run all migrations
-fastappkit migrate all
-
-# Preview SQL before applying
-fastappkit migrate preview
-```
 
 ## 🛠️ CLI Commands
 
@@ -204,11 +183,11 @@ apps = [
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see [Contributing Guide](CONTRIBUTING.md) for guidelines.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -217,7 +196,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
--   📖 [Documentation](docs/Usage.md)
+-   📖 [Documentation](Usage.md)
 -   🐛 [Issue Tracker](https://github.com/vanylabs/fastappkit/issues)
 -   💬 [Discussions](https://github.com/vanylabs/fastappkit/discussions)
 
