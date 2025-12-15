@@ -1,15 +1,10 @@
 # fastappkit
 
-> A toolkit for building FastAPI projects with apps — internal and external pluggable apps
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-
-**fastappkit** brings Django-like app architecture to FastAPI, enabling modular development with both project-specific internal apps and reusable external pluggable apps.
+**fastappkit** is an open-source toolkit that brings Django-like app architecture to FastAPI. If you've ever wished FastAPI had a modular app system similar to Django, this is for you.
 
 ## What is fastappkit?
 
-**fastappkit** is a toolkit for building FastAPI projects with a modular app architecture. It enables:
+fastappkit is a toolkit for building FastAPI projects with a modular app architecture. It enables:
 
 -   **Internal apps** — project-specific feature modules (like Django apps)
 -   **External apps** — reusable, pluggable packages (like WordPress plugins)
@@ -17,30 +12,53 @@
 -   **Automatic router mounting** — seamless integration of app routes
 -   **App validation and isolation** — ensure apps don't conflict with each other
 
-## ✨ Key Features
+## Why fastappkit?
 
--   ✅ **Clean project structure** with automatic app discovery
--   ✅ **Shared migrations** for internal apps, isolated migrations for external apps
--   ✅ **Automatic router mounting** with configurable prefixes
--   ✅ **Fail-fast validation** and error handling
--   ✅ **Support for both monorepo and multi-repo workflows**
--   ✅ **Simple CLI** for project and app management
+Building large FastAPI applications often means either cramming everything into a single file or manually organizing modules without clear conventions. fastappkit solves this by introducing a structured app system where you can organize your code into logical, reusable components—both within your project and as installable packages.
 
-## 📦 Installation
+Whether you're building a monolith that needs better organization or creating reusable components for multiple projects, fastappkit provides the structure and tooling to make it happen.
 
-Install fastappkit using pip or poetry:
+## Who can use this?
 
-```bash
-pip install fastappkit
-```
+-   **FastAPI developers** building applications that are outgrowing a single-file structure
+-   **Teams** that need consistent project organization across multiple developers
+-   **Developers** creating reusable FastAPI components they want to share
+-   **Anyone** who appreciates Django's app system but prefers FastAPI's performance and modern Python features
 
-or
+## Key Features
 
-```bash
-poetry add fastappkit
-```
+fastappkit provides several important capabilities:
 
-## 🏃 Quick Start
+**Project Structure**
+
+-   Clean project layout with automatic app discovery
+-   Consistent organization that scales as your project grows
+
+**Migration Management**
+
+-   Shared migrations for internal apps
+-   Isolated migrations for external apps
+-   Coordinated execution order
+
+**Router Integration**
+
+-   Automatic router mounting with configurable prefixes
+-   Seamless route integration without manual wiring
+
+**Validation & Safety**
+
+-   Fail-fast validation and error handling
+-   App isolation checks to prevent conflicts
+-   Manifest validation for external apps
+
+**Workflow Support**
+
+-   Works with both monorepo and multi-repo workflows
+-   Simple CLI for project and app management
+
+## Quick Start
+
+Get started with fastappkit in minutes:
 
 ### 1. Create a new project
 
@@ -49,14 +67,7 @@ fastappkit core new myproject
 cd myproject
 ```
 
-This creates a complete FastAPI project structure with:
-
--   Core application setup (including `core/models.py` with SQLAlchemy Base class)
--   Database configuration
--   Migration system
--   App directory structure
-
-**Note:** Dependency versions in `pyproject.toml` are set to `*` by default. Update them according to your needs, especially for production deployments.
+This creates a complete FastAPI project structure with core application setup, database configuration, migration system, and app directory structure.
 
 ### 2. Create an internal app
 
@@ -82,13 +93,51 @@ fastappkit core dev
 
 Your FastAPI application is now running at `http://127.0.0.1:8000`!
 
-## 📚 Documentation
+For detailed installation instructions, see the [Installation Guide](getting-started/installation.md).
 
--   **[Usage Guide](Usage.md)** - Complete usage guide with examples
--   **[CI/CD Guide](CI_CD.md)** - CI/CD workflows and release process
--   **[Contributing](CONTRIBUTING.md)** - How to contribute to fastappkit
+## Documentation Overview
 
-## 🎯 Core Concepts
+### Getting Started
+
+-   [Installation](getting-started/installation.md) - Install fastappkit and verify your setup
+-   [Quick Start](getting-started/quickstart.md) - Create your first project
+-   [Core Concepts](getting-started/core-concepts.md) - Understand internal and external apps
+
+### Guides
+
+-   [Creating Projects](guides/creating-projects.md) - Set up new fastappkit projects
+-   [Creating Apps](guides/creating-apps.md) - Build internal and external apps
+-   [Migrations](guides/migrations.md) - Manage database schema changes
+-   [Configuration](guides/configuration.md) - Configure your projects
+-   [Deployment](guides/deployment.md) - Deploy fastappkit applications
+
+### Topics
+
+-   [Internal Apps](topics/internal-apps.md) - Project-specific modules
+-   [External Apps](topics/external-apps.md) - Reusable pluggable packages
+-   [Migration System](topics/migration-system.md) - How migrations work
+-   [App Isolation](topics/app-isolation.md) - Ensuring apps don't conflict
+-   [Router Mounting](topics/router-mounting.md) - Automatic route integration
+
+### Reference
+
+-   [CLI Reference](reference/cli-reference.md) - All available commands
+-   [Configuration Reference](reference/configuration-reference.md) - Configuration options
+-   [Manifest Reference](reference/manifest-reference.md) - App manifest format
+-   [API Reference](reference/api-reference.md) - Programmatic API
+
+### Advanced
+
+-   [Architecture](advanced/architecture.md) - How fastappkit works internally
+-   [Extending fastappkit](advanced/extending-fastappkit.md) - Customize and extend
+-   [Best Practices](advanced/best-practices.md) - Recommended patterns
+
+### Troubleshooting
+
+-   [Common Issues](troubleshooting/common-issues.md) - Solutions to frequent problems
+-   [Debugging](troubleshooting/debugging.md) - Debugging techniques
+
+## Core Concepts
 
 ### Internal Apps
 
@@ -117,39 +166,7 @@ fastappkit provides unified migration management:
 -   **Internal app migrations**: Shared migration directory for all internal apps
 -   **External app migrations**: Isolated migrations per external app
 
-## 🛠️ CLI Commands
-
-### Project Management
-
-```bash
-fastappkit core new <name>          # Create a new project
-fastappkit core dev                  # Run development server
-```
-
-### App Management
-
-```bash
-fastappkit app new <name>            # Create an internal app
-fastappkit app new <name> --as-package  # Create an external app
-fastappkit app list                  # List all apps
-fastappkit app validate <name>       # Validate an app
-```
-
-### Migration Management
-
-```bash
-fastappkit migrate core -m "message"           # Create core migration
-fastappkit migrate app <name> makemigrations -m "message"  # Create app migration (internal only)
-fastappkit migrate app <name> upgrade [--revision <rev>]  # Upgrade app migrations (external only)
-fastappkit migrate app <name> downgrade --revision <rev>  # Downgrade app migrations (external only, --revision required)
-fastappkit migrate app <name> preview [--revision <rev>]  # Preview SQL for app migrations (external only)
-fastappkit migrate all                        # Run all migrations
-fastappkit migrate preview [--revision <rev>]  # Preview SQL for core + internal app migrations
-fastappkit migrate upgrade [--revision <rev>]  # Upgrade core + internal app migrations
-fastappkit migrate downgrade <rev>            # Downgrade core + internal app migrations (<rev> required)
-```
-
-## 📖 Example Project Structure
+## Example Project Structure
 
 ```
 myproject/
@@ -159,47 +176,31 @@ myproject/
 │   ├── app.py             # create_app() factory
 │   └── db/
 │       └── migrations/    # Core migrations
-├── apps/                   # Internal apps directory
+├── apps/                  # Internal apps directory
 │   └── blog/
-│       ├── models.py       # Imports Base from core.models
+│       ├── models.py      # Imports Base from core.models
 │       └── router.py
 ├── fastappkit.toml        # Project configuration
 ├── .env                   # Environment variables
 └── main.py                # Entry point
 ```
 
-## 🔧 Configuration
+## Community
 
-fastappkit uses `fastappkit.toml` for project configuration:
+fastappkit is an open-source project. We welcome contributions and value our community.
 
-```toml
-[tool.fastappkit]
-apps = [
-    "apps.blog",
-    "apps.users",
-    "external_package_name"
-]
-```
+-   [Contributing](community/index.md#contributing) - How to contribute
+-   [Code of Conduct](community/index.md#code-of-conduct) - Community standards
+-   [Security Policy](community/index.md#security-policy) - Reporting vulnerabilities
+-   [License](community/index.md#license) - MIT License
 
-## 🤝 Contributing
+## Support
 
-We welcome contributions! Please see [Contributing Guide](CONTRIBUTING.md) for guidelines.
+-   [Documentation](getting-started/installation.md)
+-   [Issue Tracker](https://github.com/vanylabs/fastappkit/issues)
+-   [Discussions](https://github.com/vanylabs/fastappkit/discussions)
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 -   Inspired by Django's app system
 -   Built with [FastAPI](https://fastapi.tiangolo.com/), [SQLAlchemy](https://www.sqlalchemy.org/), [Alembic](https://alembic.sqlalchemy.org/), and [Typer](https://typer.tiangolo.com/)
-
-## 📞 Support
-
--   📖 [Documentation](Usage.md)
--   🐛 [Issue Tracker](https://github.com/vanylabs/fastappkit/issues)
--   💬 [Discussions](https://github.com/vanylabs/fastappkit/discussions)
-
----
-
-**Made with ❤️ for the FastAPI community**

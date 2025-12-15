@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to fastappkit! This document provides guidelines and instructions for contributing.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Development Environment Setup
 
@@ -38,7 +38,7 @@ fastappkit uses Poetry for dependency management. Follow these steps to set up y
     fastappkit --version
     ```
 
-## 📝 Code Style
+## Code Style
 
 fastappkit follows strict code style guidelines to maintain consistency.
 
@@ -88,7 +88,7 @@ poetry run pre-commit install
 poetry run pre-commit run --all-files
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Running Tests
 
@@ -143,7 +143,7 @@ poetry run pytest --cov=fastappkit --cov-report=html
 open htmlcov/index.html  # View coverage report
 ```
 
-## 📦 Building and Distributing
+## Building and Distributing
 
 ### Local Build
 
@@ -167,7 +167,7 @@ Test installation from the built package:
 pip install dist/fastappkit-*.whl
 ```
 
-## 🔀 Git Workflow
+## Git Workflow
 
 ### Branch Naming
 
@@ -244,7 +244,7 @@ Now they are handled with a clear error message.
 
 6. **Ensure CI passes** - All checks must pass before merge
 
-## 📋 Pull Request Checklist
+## Pull Request Checklist
 
 Before submitting a PR, ensure:
 
@@ -256,7 +256,7 @@ Before submitting a PR, ensure:
 -   [ ] Commit messages follow conventional format
 -   [ ] PR description explains the changes and why
 
-## 🐛 Reporting Bugs
+## Reporting Bugs
 
 When reporting bugs, please include:
 
@@ -270,9 +270,9 @@ When reporting bugs, please include:
     - OS and version
 6. **Error messages** or logs (if any)
 
-Use the [bug report template](.github/ISSUE_TEMPLATE/bug.yml) if available.
+Use the GitHub issue templates if available.
 
-## 💡 Feature Requests
+## Feature Requests
 
 When requesting features, please include:
 
@@ -280,9 +280,9 @@ When requesting features, please include:
 2. **Proposed solution** - How should it work?
 3. **Alternatives considered** - Other approaches you've thought about
 
-Use the [feature request template](.github/ISSUE_TEMPLATE/feature.yml) if available.
+Use the GitHub issue templates if available.
 
-## 📚 Documentation
+## Documentation
 
 ### Code Documentation
 
@@ -304,11 +304,11 @@ def create_app(settings: SettingsProtocol) -> FastAPI:
 
 ### User Documentation
 
--   Update `docs/Usage.md` for user-facing changes
+-   Update documentation files for user-facing changes
 -   Update README.md if needed
 -   Add examples for new features
 
-## 🎯 Areas for Contribution
+## Areas for Contribution
 
 We welcome contributions in these areas:
 
@@ -319,16 +319,16 @@ We welcome contributions in these areas:
 -   **Performance** - Optimize app loading, migrations, etc.
 -   **Examples** - Add example projects or apps
 
-## ❓ Questions?
+## Questions
 
 -   Open a [GitHub Discussion](https://github.com/vanylabs/fastappkit/discussions)
 -   Check existing [Issues](https://github.com/vanylabs/fastappkit/issues)
--   Review [Documentation](docs/Usage.md)
+-   Review [Documentation](getting-started/installation.md)
 
-## 📜 Code of Conduct
+## Code of Conduct
 
-Please note that this project follows a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+Please note that this project follows a Code of Conduct. By participating, you are expected to uphold this code. See [CODE_OF_CONDUCT.md](https://github.com/vanylabs/fastappkit/blob/main/CODE_OF_CONDUCT.md) for details.
 
 ---
 
-Thank you for contributing to fastappkit! 🎉
+Thank you for contributing to fastappkit!

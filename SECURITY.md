@@ -101,7 +101,7 @@ When using fastappkit:
 Security updates will be:
 
 -   Released as **patch versions** (e.g., 0.1.0 → 0.1.1)
--   Documented in the [CHANGELOG.md](docs/CHANGELOG.md)
+-   Documented in the [CHANGELOG.md](https://github.com/vanylabs/fastappkit/blob/main/CHANGELOG.md)
 -   Announced via GitHub releases
 -   Tagged with the `security` label
 
@@ -137,7 +137,7 @@ bandit -r fastappkit/
 
 We thank security researchers who responsibly disclose vulnerabilities. Contributors will be credited in:
 
--   The [CHANGELOG.md](docs/CHANGELOG.md)
+-   The [CHANGELOG.md](https://github.com/vanylabs/fastappkit/blob/main/CHANGELOG.md)
 -   GitHub releases
 -   Security advisories
 

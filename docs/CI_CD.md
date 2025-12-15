@@ -1,10 +1,10 @@
-# 🚀 CI/CD & Release Process for fastappkit
+# CI/CD & Release Process
 
 Quick reference for understanding CI workflows and release process.
 
 ---
 
-## 🌿 Branch Strategy
+## Branch Strategy
 
 **Structure:**
 
@@ -23,7 +23,7 @@ main (production-ready)
 
 ---
 
-## 🔄 GitHub Actions Workflows
+## GitHub Actions Workflows
 
 ### 1. **CI Workflow** (`.github/workflows/ci.yml`)
 
@@ -34,7 +34,7 @@ main (production-ready)
 
 **Jobs:**
 
-1. **Test Matrix** (Python 3.11, 3.12)
+1. **Test Matrix** (Python 3.11, 3.12 - tested versions)
 
     - Install Poetry & dependencies
     - Run tests with coverage
@@ -67,23 +67,25 @@ main (production-ready)
 
 ---
 
-## 📦 Version Management
+## Version Management
 
 **Files to keep in sync:**
 
 -   `pyproject.toml` - Updated via `poetry version`
 -   `fastappkit/__init__.py` - Manual update to match
+-   `README.md` - Update version badge (line 4)
 
 **Process:**
 
 ```bash
 poetry version patch  # or minor/major
 # Manually update fastappkit/__init__.py to match
+# Manually update README.md version badge to match
 ```
 
 ---
 
-## 📝 Release Process
+## Release Process
 
 ### Step-by-Step Checklist
 
@@ -106,35 +108,42 @@ poetry version patch  # or minor/major
     # Update __version__ = "0.1.1" to match pyproject.toml
     ```
 
-4. **Create changelog entry**
+4. **Update version badge in `README.md`**
+
+    ```bash
+    # Update the version badge on line 4:
+    # [![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](https://github.com/vanylabs/fastappkit/releases)
+    ```
+
+5. **Create changelog entry**
 
     ```bash
     # Create docs/changelog/0.1.1.md with release notes
-    # Update docs/CHANGELOG.md to add link to new version
+    # Update CHANGELOG.md in repo root to add link to new version
     ```
 
-5. **Commit changes**
+6. **Commit changes**
 
     ```bash
-    git add pyproject.toml fastappkit/__init__.py docs/changelog/
+    git add pyproject.toml fastappkit/__init__.py README.md docs/changelog/
     git commit -m "chore: prepare release v0.1.1"
     ```
 
-6. **Create and push tag**
+7. **Create and push tag**
 
     ```bash
     git tag -a v0.1.1 -m "Release v0.1.1"
     git push origin main --tags
     ```
 
-7. **GitHub Action automatically:**
+8. **GitHub Action automatically:**
     - Detects tag
     - Builds package
     - Publishes to PyPI
 
 ---
 
-## 🎯 Workflow Triggers
+## Workflow Triggers
 
 | Workflow    | Trigger             | When          |
 | ----------- | ------------------- | ------------- |
@@ -144,7 +153,7 @@ poetry version patch  # or minor/major
 
 ---
 
-## 🔐 Security
+## Security
 
 -   **PyPI Publishing:** Trusted Publishing (OIDC) - no tokens stored
 -   **Branch Protection:** Require PR reviews, CI must pass before merge
@@ -152,7 +161,7 @@ poetry version patch  # or minor/major
 
 ---
 
-## 🚀 PyPI Setup (One-Time)
+## PyPI Setup (One-Time)
 
 Set up PyPI Trusted Publishing to enable automatic publishing from GitHub Actions:
 
@@ -172,7 +181,7 @@ Set up PyPI Trusted Publishing to enable automatic publishing from GitHub Action
 
 ---
 
-## 📋 Key Decisions
+## Key Decisions
 
 -   **Branch Strategy:** Feature branches → `main` (no `develop` branch)
 -   **Version Bumping:** Manual (`poetry version`)
@@ -183,5 +192,5 @@ Set up PyPI Trusted Publishing to enable automatic publishing from GitHub Action
 
 **Workflow Files:**
 
--   `.github/workflows/ci.yml` ✅ Required
--   `.github/workflows/publish.yml` ✅ Required
+-   `.github/workflows/ci.yml` - Required
+-   `.github/workflows/publish.yml` - Required
