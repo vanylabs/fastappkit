@@ -74,6 +74,10 @@ main (production-ready)
 -   `pyproject.toml` - Updated via `poetry version`
 -   `fastappkit/__init__.py` - Manual update to match
 -   `README.md` - Update version badge (line 4)
+-   `docs/changelog/X.X.X.md` - Create new changelog file
+-   `CHANGELOG.md` (repo root) - Add version to Version History
+-   `mkdocs.yml` - Add version to Changelog navigation
+-   `docs/community/index.md` - Add version to Changelog section
 
 **Process:**
 
@@ -81,6 +85,10 @@ main (production-ready)
 poetry version patch  # or minor/major
 # Manually update fastappkit/__init__.py to match
 # Manually update README.md version badge to match
+# Create docs/changelog/X.X.X.md
+# Update CHANGELOG.md (repo root)
+# Update mkdocs.yml navigation
+# Update docs/community/index.md
 ```
 
 ---
@@ -117,15 +125,41 @@ poetry version patch  # or minor/major
 
 5. **Create changelog entry**
 
+    Create the changelog entry and update all references:
+
+    a. **Create changelog file:**
+
     ```bash
     # Create docs/changelog/0.1.1.md with release notes
-    # Update CHANGELOG.md in repo root to add link to new version
+    # Follow the format from existing changelog files
+    ```
+
+    b. **Update `CHANGELOG.md` in repo root:**
+
+    ```bash
+    # Add new version to the Version History section at the top:
+    # -   **[0.1.1](docs/changelog/0.1.1.md)** - Brief description
+    ```
+
+    c. **Update `mkdocs.yml` navigation:**
+
+    ```bash
+    # Add to Changelog section in nav (place newest version first):
+    # - Version 0.1.1: changelog/0.1.1.md
+    ```
+
+    d. **Update `docs/community/index.md`:**
+
+    ```bash
+    # Add to the Changelog section (place newest version first):
+    # -   [Version 0.1.1](changelog/0.1.1.md) - Brief description
     ```
 
 6. **Commit changes**
 
     ```bash
-    git add pyproject.toml fastappkit/__init__.py README.md docs/changelog/
+    git add pyproject.toml fastappkit/__init__.py README.md \
+            docs/changelog/ CHANGELOG.md mkdocs.yml docs/community/index.md
     git commit -m "chore: prepare release v0.1.1"
     ```
 
