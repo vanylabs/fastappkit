@@ -85,4 +85,4 @@ nav:
 # Extra
 extra:
     version:
-        provider: mike
+        provider: readthedocs
