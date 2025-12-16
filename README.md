@@ -60,7 +60,7 @@ This is an open-source project, and contributions are welcome. See [CONTRIBUTING
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License. See [LICENSE](https://github.com/vanylabs/fastappkit/blob/main/LICENSE) for details.
 
 ## Support
 
