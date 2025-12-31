@@ -244,7 +244,7 @@ When creating a new project or external app, dependency versions in `pyproject.t
 
 ```toml
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<4.0"
 fastapi = ">=0.120.0,<0.130"  # Specific range instead of *
 sqlalchemy = ">=2.0,<3.0"
 alembic = ">=1.17.2,<1.18"

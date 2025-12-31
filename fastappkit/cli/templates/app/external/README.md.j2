@@ -8,9 +8,68 @@ External pluggable app for fastappkit.
 pip install -e .
 ```
 
-## Usage
+## Configuration
 
-Add to your `fastappkit.toml`:
+This app uses a `.env` file for configuration. A `.env` file is created automatically when you create the app.
+
+**Configure your environment:**
+
+1. Edit the `.env` file in the app root directory:
+   ```bash
+   # Database Configuration
+   DATABASE_URL=sqlite:///./{{ app_name }}.db
+
+   # Development Settings
+   DEBUG=false
+   ```
+
+2. For production or different databases, update `DATABASE_URL`:
+   ```bash
+   DATABASE_URL=postgresql://user:password@localhost/{{ app_name }}
+   ```
+
+The `.env` file is automatically loaded by `config.py` using `pydantic-settings`.
+
+## Independent Development
+
+This external app can be developed and tested independently without requiring a full fastappkit project.
+
+### Running the Server
+
+Start the development server:
+
+```bash
+# From the app root directory
+uvicorn main:app --reload
+```
+
+Or use Python directly:
+
+```bash
+python main.py
+```
+
+The server will start on `http://127.0.0.1:8000` with the app's routes available at `/{{ app_name }}/`.
+
+### Project Structure
+
+```
+{{ app_name }}/
+├── {{ app_name }}/          # Package directory
+│   ├── __init__.py          # register() function
+│   ├── models.py            # SQLAlchemy models
+│   ├── router.py            # FastAPI routes
+│   ├── config.py            # Settings (loads from .env)
+│   └── migrations/          # Alembic migrations
+├── main.py                  # Entry point for independent development
+├── alembic.ini              # Alembic configuration
+├── .env                     # Environment variables (gitignored)
+└── pyproject.toml           # Package metadata
+```
+
+## Usage in a Core Project
+
+To use this app in a fastappkit project, add it to your `fastappkit.toml`:
 
 ```toml
 [tool.fastappkit]
@@ -53,7 +112,9 @@ alembic downgrade -1
 alembic upgrade head --sql
 ```
 
-**Database URL**: Set `DATABASE_URL` environment variable, or edit `alembic.ini` to configure your database.
+**Database URL**: The `DATABASE_URL` is read from the `.env` file automatically. You can also:
+- Set `DATABASE_URL` environment variable (takes precedence)
+- Edit `alembic.ini` sqlalchemy.url (fallback)
 
 ### When Using the External App in a Core Project
 

@@ -1,0 +1,44 @@
+"""
+Main entry point for {{ app_name }}.
+
+Run with: uvicorn main:app --reload
+
+This allows you to develop and test the external app independently
+without requiring a full fastappkit project.
+"""
+
+import sys
+from pathlib import Path
+
+# Add current directory to sys.path so we can import the package
+# This allows running without 'pip install -e .' (though that's recommended)
+_current_dir = Path(__file__).parent
+if str(_current_dir) not in sys.path:
+    sys.path.insert(0, str(_current_dir))
+
+from fastapi import FastAPI
+
+from {{ app_name }}.config import Settings
+from {{ app_name }} import register
+
+# Load settings from .env
+settings = Settings()
+
+# Create FastAPI app
+app = FastAPI(
+    title="{{ app_name }}",
+    description="External pluggable app for fastappkit",
+    debug=settings.debug,
+)
+
+# Register this app's router
+router = register(app)
+if router is not None:
+    # If register() returns a router, mount it with default prefix
+    app.include_router(router, prefix="/{{ app_name }}", tags=["{{ app_name }}"])
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

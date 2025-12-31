@@ -126,8 +126,10 @@ def new(
                 ("app/external/__init__.py.j2", f"{name}/{name}/__init__.py"),
                 ("app/external/models.py.j2", f"{name}/{name}/models.py"),
                 ("app/external/router.py.j2", f"{name}/{name}/router.py"),
+                ("app/external/config.py.j2", f"{name}/{name}/config.py"),
                 ("app/external/pyproject.toml.j2", f"{name}/pyproject.toml"),
                 ("app/external/README.md.j2", f"{name}/README.md"),
+                ("app/external/main.py.j2", f"{name}/main.py"),
             ]
 
             # Create fastappkit.toml INSIDE package directory (included in package when published)
@@ -172,6 +174,11 @@ def new(
                 context,
             )
             output.verbose("Created .gitignore")
+
+            # Create .env from env.example template
+            env_example_content = template_engine.render("app/external/env.example.j2", context)
+            (app_path / ".env").write_text(env_example_content, encoding="utf-8")
+            output.verbose("Created .env")
         else:
             # Internal app templates
             # Internal apps don't have their own migrations - they use core's migrations
@@ -205,7 +212,9 @@ def new(
             output.info("\nNext steps:")
             output.info(f"  cd {name}")
             output.info("  pip install -e .  # Install the package")
-            output.info(f"  # Add '{name}' to fastappkit.toml apps list")
+            output.info("  # Configure .env file (DATABASE_URL, DEBUG, etc.)")
+            output.info("  # Run independently: uvicorn main:app --reload")
+            output.info("  # Or add to fastappkit.toml apps list in a core project")
             output.info(f"  fastappkit migrate app {name} makemigrations")
             output.warning(
                 "\n⚠️  Note: Dependency versions in pyproject.toml are set to '*' (any version)."
