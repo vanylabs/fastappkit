@@ -6,10 +6,10 @@ Complete reference for all fastappkit CLI commands.
 
 All commands support these global options:
 
-- `--verbose, -v`: Enable verbose output
-- `--debug`: Enable debug output (includes stack traces)
-- `--quiet, -q`: Suppress output
-- `--version, -V`: Show version and exit
+-   `--verbose, -v`: Enable verbose output
+-   `--debug`: Enable debug output (includes stack traces)
+-   `--quiet, -q`: Suppress output
+-   `--version, -V`: Show version and exit
 
 ### Show Version
 
@@ -35,12 +35,12 @@ fastappkit core new <name> [--project-root <path>] [--description <text>]
 
 **Arguments:**
 
-- `<name>`: Project name (required)
+-   `<name>`: Project name (required)
 
 **Options:**
 
-- `--project-root <path>`: Directory to create project in (default: current working directory)
-- `--description <text>`: Project description
+-   `--project-root <path>`: Directory to create project in (default: current working directory)
+-   `--description <text>`: Project description
 
 **Examples:**
 
@@ -62,13 +62,13 @@ fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--de
 
 **Options:**
 
-- `--host, -h <host>`: Host to bind to (default: `127.0.0.1`)
-- `--port, -p <port>`: Port to bind to (default: `8000`)
-- `--reload`: Enable auto-reload on code changes
-- `--verbose, -v`: Enable verbose output (overrides global setting)
-- `--debug`: Enable debug output (overrides global setting, includes stack traces)
-- `--quiet, -q`: Suppress output (overrides global setting)
-- `<uvicorn-options>`: Additional options are forwarded to uvicorn (e.g., `--workers`, `--log-level`, `--access-log`)
+-   `--host, -h <host>`: Host to bind to (default: `127.0.0.1`)
+-   `--port, -p <port>`: Port to bind to (default: `8000`)
+-   `--reload`: Enable auto-reload on code changes
+-   `--verbose, -v`: Enable verbose output (overrides global setting)
+-   `--debug`: Enable debug output (overrides global setting, includes stack traces)
+-   `--quiet, -q`: Suppress output (overrides global setting)
+-   `<uvicorn-options>`: Additional options are forwarded to uvicorn (e.g., `--workers`, `--log-level`, `--access-log`)
 
 **Note:** This command must be run from the project root directory (where `fastappkit.toml` is located). All additional arguments are forwarded to uvicorn, allowing you to use any uvicorn option.
 
@@ -97,11 +97,11 @@ fastappkit app new <name> [--as-package]
 
 **Arguments:**
 
-- `<name>`: App name (required)
+-   `<name>`: App name (required)
 
 **Options:**
 
-- `--as-package`: Create as external package (required for external apps)
+-   `--as-package`: Create as external package (required for external apps)
 
 **Note:** This command must be run from the project root directory (where `fastappkit.toml` is located).
 
@@ -124,9 +124,9 @@ fastappkit app list [--verbose] [--debug] [--quiet]
 
 **Options:**
 
-- `--verbose, -v`: Show detailed information (import path, migrations path, etc.)
-- `--debug`: Show debug information
-- `--quiet, -q`: Suppress output
+-   `--verbose, -v`: Show detailed information (import path, migrations path, etc.)
+-   `--debug`: Show debug information
+-   `--quiet, -q`: Suppress output
 
 **Note:** This command must be run from the project root directory.
 
@@ -149,11 +149,11 @@ fastappkit app validate <name> [--json]
 
 **Arguments:**
 
-- `<name>`: App name (required)
+-   `<name>`: App name (required)
 
 **Options:**
 
-- `--json`: Output results as JSON (CI-friendly)
+-   `--json`: Output results as JSON (CI-friendly)
 
 **Note:** This command must be run from the project root directory.
 
@@ -178,7 +178,7 @@ fastappkit migrate core -m <message>
 
 **Options:**
 
-- `-m, --message <message>`: Migration message (required)
+-   `-m, --message <message>`: Migration message (required)
 
 **Note:** This command must be run from the project root directory.
 
@@ -200,33 +200,33 @@ fastappkit migrate app <name> <action> [options]
 
 **Arguments:**
 
-- `<name>`: App name (required)
-- `<action>`: Migration action (required)
+-   `<name>`: App name (required)
+-   `<action>`: Migration action (required)
 
 **Actions:**
 
-- `makemigrations`: Generate new migration (internal apps only)
-- `upgrade`: Apply migrations (external apps only)
-- `downgrade`: Revert migrations (external apps only)
-- `preview`: Show SQL without executing (external apps only)
+-   `makemigrations`: Generate new migration (internal apps only)
+-   `upgrade`: Apply migrations (external apps only)
+-   `downgrade`: Revert migrations (external apps only)
+-   `preview`: Show SQL without executing (external apps only)
 
 **Options:**
 
-- `-m, --message <message>`: Migration message (required for `makemigrations`)
-- `--revision, -r <rev>`: Specific revision (default: `head` for upgrade/preview)
+-   `-m, --message <message>`: Migration message (required for `makemigrations`)
+-   `--revision, -r <rev>`: Specific revision (default: `head` for upgrade/preview)
 
 **Note:** This command must be run from the project root directory.
 
 **Limitations:**
 
-- Internal apps can only use `makemigrations` action. For preview/upgrade/downgrade, use unified commands (`fastappkit migrate preview/upgrade/downgrade`).
-- External apps cannot use `makemigrations` from the core project. Migrations must be created in the external app's own directory using `alembic` directly.
+-   Internal apps can only use `makemigrations` action. For preview/upgrade/downgrade, use unified commands (`fastappkit migrate preview/upgrade/downgrade`).
+-   External apps cannot use `makemigrations` from the core project. Migrations must be created in the external app's own directory using `alembic` directly.
 
 **Error Scenarios:**
 
-- If external app has no migration files, the command will fail with instructions on how to create migrations independently.
-- If revision is not found, the command will fail with helpful error messages.
-- If app is not found in registry, the command will fail with app name error.
+-   If external app has no migration files, the command will fail with instructions on how to create migrations independently.
+-   If revision is not found, the command will fail with helpful error messages.
+-   If app is not found in registry, the command will fail with app name error.
 
 **Examples:**
 
@@ -259,7 +259,7 @@ fastappkit migrate preview [--revision <rev>]
 
 **Options:**
 
-- `--revision, -r <rev>`: Specific revision (default: `head`)
+-   `--revision, -r <rev>`: Specific revision (default: `head`)
 
 **Note:** This command must be run from the project root directory.
 
@@ -282,7 +282,7 @@ fastappkit migrate upgrade [--revision <rev>]
 
 **Options:**
 
-- `--revision, -r <rev>`: Specific revision (default: `head`)
+-   `--revision, -r <rev>`: Specific revision (default: `head`)
 
 **Note:** This command must be run from the project root directory.
 
@@ -305,7 +305,7 @@ fastappkit migrate downgrade <revision>
 
 **Arguments:**
 
-- `<revision>`: Revision to downgrade to (required)
+-   `<revision>`: Revision to downgrade to (required)
 
 **Note:** This command must be run from the project root directory.
 
@@ -341,22 +341,22 @@ fastappkit migrate all
 
 ## Command Reference Table
 
-| Command | Description | Options |
-|---------|-------------|---------|
-| `fastappkit core new <name>` | Create new project | `--project-root`, `--description` |
-| `fastappkit core dev` | Run development server | `--host`, `--port`, `--reload`, `--verbose`, `--debug`, `--quiet`, plus any uvicorn options |
-| `fastappkit app new <name>` | Create internal app | `--as-package` |
-| `fastappkit app list` | List all apps | `--verbose`, `--debug`, `--quiet` |
-| `fastappkit app validate <name>` | Validate app | `--json` |
-| `fastappkit migrate core` | Core migrations | `-m, --message` |
-| `fastappkit migrate app <name>` | App migrations | `makemigrations`, `upgrade`, `downgrade`, `preview` |
-| `fastappkit migrate preview` | Preview SQL | `--revision` |
-| `fastappkit migrate upgrade` | Upgrade migrations | `--revision` |
-| `fastappkit migrate downgrade <rev>` | Downgrade migrations | (revision required) |
-| `fastappkit migrate all` | Apply all migrations | (no options) |
+| Command                              | Description            | Options                                                                                     |
+| ------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------- |
+| `fastappkit core new <name>`         | Create new project     | `--project-root`, `--description`                                                           |
+| `fastappkit core dev`                | Run development server | `--host`, `--port`, `--reload`, `--verbose`, `--debug`, `--quiet`, plus any uvicorn options |
+| `fastappkit app new <name>`          | Create internal app    | `--as-package`                                                                              |
+| `fastappkit app list`                | List all apps          | `--verbose`, `--debug`, `--quiet`                                                           |
+| `fastappkit app validate <name>`     | Validate app           | `--json`                                                                                    |
+| `fastappkit migrate core`            | Core migrations        | `-m, --message`                                                                             |
+| `fastappkit migrate app <name>`      | App migrations         | `makemigrations`, `upgrade`, `downgrade`, `preview`                                         |
+| `fastappkit migrate preview`         | Preview SQL            | `--revision`                                                                                |
+| `fastappkit migrate upgrade`         | Upgrade migrations     | `--revision`                                                                                |
+| `fastappkit migrate downgrade <rev>` | Downgrade migrations   | (revision required)                                                                         |
+| `fastappkit migrate all`             | Apply all migrations   | (no options)                                                                                |
 
 ## Learn More
 
-- [Creating Projects](../guides/creating-projects.md) - Project creation guide
-- [Creating Apps](../guides/creating-apps.md) - App creation guide
-- [Migrations](../guides/migrations.md) - Migration workflows
+-   [Creating Projects](../guides/creating-projects.md) - Project creation guide
+-   [Creating Apps](../guides/creating-apps.md) - App creation guide
+-   [Migrations](../guides/migrations.md) - Migration workflows

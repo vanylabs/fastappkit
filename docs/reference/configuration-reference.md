@@ -19,8 +19,8 @@ apps = [
 
 ### App Entry Formats
 
-- `apps.<name>` → Internal app (located in `./apps/<name>/`)
-- `<package_name>` → External app (pip-installed package, must be importable)
+-   `apps.<name>` → Internal app (located in `./apps/<name>/`)
+-   `<package_name>` → External app (pip-installed package, must be importable)
 
 ### Migration Order
 
@@ -103,10 +103,10 @@ class Settings(BaseSettings):
 
 **BaseSettings Configuration:**
 
-- `env_file`: Path to `.env` file (default: `.env`)
-- `env_file_encoding`: Encoding for `.env` file (default: `utf-8`)
-- `case_sensitive`: Whether environment variable names are case-sensitive (default: `False`)
-- `extra`: How to handle extra fields (`"ignore"`, `"forbid"`, `"allow"`)
+-   `env_file`: Path to `.env` file (default: `.env`)
+-   `env_file_encoding`: Encoding for `.env` file (default: `utf-8`)
+-   `case_sensitive`: Whether environment variable names are case-sensitive (default: `False`)
+-   `extra`: How to handle extra fields (`"ignore"`, `"forbid"`, `"allow"`)
 
 ### Environment Variables
 
@@ -131,5 +131,5 @@ See the [Manifest Reference](manifest-reference.md) for complete details.
 
 ## Learn More
 
-- [Configuration Guide](../guides/configuration.md) - Configuration guide
-- [Manifest Reference](manifest-reference.md) - External app manifest schema
+-   [Configuration Guide](../guides/configuration.md) - Configuration guide
+-   [Manifest Reference](manifest-reference.md) - External app manifest schema

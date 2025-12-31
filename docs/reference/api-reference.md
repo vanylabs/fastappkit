@@ -23,10 +23,10 @@ app = kit.create_app()
 
 Create and configure FastAPI application.
 
-- Loads all apps from `fastappkit.toml`
-- Validates app manifests
-- Mounts routers with automatic prefixes
-- Returns configured FastAPI application
+-   Loads all apps from `fastappkit.toml`
+-   Validates app manifests
+-   Mounts routers with automatic prefixes
+-   Returns configured FastAPI application
 
 ## Settings API
 
@@ -198,5 +198,5 @@ print(sql)
 
 ## Learn More
 
-- [Architecture](../advanced/architecture.md) - System architecture
-- [Extending fastappkit](../advanced/extending-fastappkit.md) - Extension guide
+-   [Architecture](../advanced/architecture.md) - System architecture
+-   [Extending fastappkit](../advanced/extending-fastappkit.md) - Extension guide
