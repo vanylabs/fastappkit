@@ -8,6 +8,7 @@ import shutil
 import sys
 import traceback
 from pathlib import Path
+from typing import Any
 
 import typer
 import uvicorn
@@ -122,8 +123,9 @@ def new(
         raise typer.Exit(1)
 
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def dev(
+    ctx: typer.Context,
     host: str = typer.Option("127.0.0.1", "--host", "-h", help="Host to bind to"),
     port: int = typer.Option(8000, "--port", "-p", help="Port to bind to"),
     reload: bool = typer.Option(False, "--reload", help="Enable auto-reload"),
@@ -131,7 +133,14 @@ def dev(
     debug: bool = typer.Option(False, "--debug", help="Enable debug output"),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress output"),
 ) -> None:
-    """Run development server. Must be run from project root."""
+    """Run development server. Must be run from project root.
+
+    All additional arguments are forwarded to uvicorn.
+    Examples:
+        fastappkit core dev --workers 4
+        fastappkit core dev --log-level debug
+        fastappkit core dev --access-log
+    """
     # Override output level if flags are provided at command level
     if quiet or verbose or debug:
         if quiet:
@@ -152,9 +161,23 @@ def dev(
         # This will execute core.app which initializes FastAppKit with Settings
         ensure_settings_loaded(project_root)
 
+        # Parse remaining arguments and convert to uvicorn kwargs
+        uvicorn_kwargs = _parse_uvicorn_args(ctx.args, host=host, port=port, reload=reload)
+
+        # Determine log level based on output level
+        if output.level.value >= 3:  # debug
+            uvicorn_kwargs.setdefault("log_level", "debug")
+        elif output.level.value >= 2:  # verbose
+            uvicorn_kwargs.setdefault("log_level", "info")
+        else:
+            uvicorn_kwargs.setdefault("log_level", "warning")
+
         # Run uvicorn
-        output.success(f"Starting development server on http://{host}:{port}")
-        if reload:
+        display_host = uvicorn_kwargs.get("host", host)
+        display_port = uvicorn_kwargs.get("port", port)
+        output.success(f"Starting development server on http://{display_host}:{display_port}")
+
+        if uvicorn_kwargs.get("reload"):
             output.info("Auto-reload enabled")
             # For reload to work, uvicorn needs an import string, not an app object
             # Ensure project root is on sys.path so Python can import main module
@@ -162,27 +185,15 @@ def dev(
                 sys.path.insert(0, str(project_root))
 
             # Use import string for reload (main:app imports core.app which sets up app)
-            uvicorn.run(
-                "main:app",  # Import string: module "main", variable "app"
-                host=host,
-                port=port,
-                reload=reload,
-                log_level="info" if output.level.value >= 2 else "warning",
-            )
+            uvicorn.run("main:app", **uvicorn_kwargs)
         else:
             # Without reload, import main:app to get the app object
             if str(project_root) not in sys.path:
                 sys.path.insert(0, str(project_root))
 
-            from main import app as fastapi_app  # type: ignore[import-not-found]
+            from main import app as fastapi_app
 
-            uvicorn.run(
-                fastapi_app,
-                host=host,
-                port=port,
-                reload=reload,
-                log_level="info" if output.level.value >= 2 else "warning",
-            )
+            uvicorn.run(fastapi_app, **uvicorn_kwargs)
     except ConfigError as e:
         output.error(f"Configuration error: {e}")
         raise typer.Exit(1)
@@ -191,3 +202,76 @@ def dev(
         if output.level.value >= 3:  # debug level
             traceback.print_exc()
         raise typer.Exit(1)
+
+
+def _parse_uvicorn_args(args: list[str], host: str, port: int, reload: bool) -> dict[str, Any]:
+    """
+    Parse command-line arguments and convert them to uvicorn kwargs.
+
+    Args:
+        args: Remaining command-line arguments
+        host: Default host value
+        port: Default port value
+        reload: Default reload value
+
+    Returns:
+        Dictionary of uvicorn kwargs
+    """
+    kwargs: dict[str, object] = {
+        "host": host,
+        "port": port,
+        "reload": reload,
+    }
+
+    i = 0
+    while i < len(args):
+        arg = args[i]
+
+        # Handle --flag (boolean flags)
+        if arg.startswith("--") and "=" not in arg:
+            flag_name = arg[2:].replace("-", "_")
+
+            # Check if next arg is a value (not another flag)
+            if i + 1 < len(args) and not args[i + 1].startswith("-"):
+                value = args[i + 1]
+                # Try to convert to appropriate type
+                if value.lower() in ("true", "1", "yes", "on"):
+                    kwargs[flag_name] = True
+                elif value.lower() in ("false", "0", "no", "off"):
+                    kwargs[flag_name] = False
+                elif value.isdigit():
+                    kwargs[flag_name] = int(value)
+                else:
+                    kwargs[flag_name] = value
+                i += 2
+            else:
+                # Boolean flag (presence means True)
+                kwargs[flag_name] = True
+                i += 1
+
+        # Handle --flag=value
+        elif arg.startswith("--") and "=" in arg:
+            flag_part, value_part = arg[2:].split("=", 1)
+            flag_name = flag_part.replace("-", "_")
+
+            # Try to convert to appropriate type
+            if value_part.lower() in ("true", "1", "yes", "on"):
+                kwargs[flag_name] = True
+            elif value_part.lower() in ("false", "0", "no", "off"):
+                kwargs[flag_name] = False
+            elif value_part.isdigit():
+                kwargs[flag_name] = int(value_part)
+            else:
+                kwargs[flag_name] = value_part
+            i += 1
+
+        # Handle -f (short flags)
+        elif arg.startswith("-") and not arg.startswith("--") and len(arg) > 1:
+            # Short flags are typically single character, skip for now
+            # (uvicorn mostly uses long-form flags)
+            i += 1
+        else:
+            # Unknown argument, skip
+            i += 1
+
+    return kwargs

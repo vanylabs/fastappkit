@@ -40,29 +40,48 @@ Settings are defined in `core/config.py` using Pydantic's `BaseSettings`.
 ### Basic Settings
 
 ```python
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./app.db"
-    DEBUG: bool = False
+    database_url: str = Field(
+        default="sqlite:///./app.db",
+        alias="DATABASE_URL"
+    )
+    debug: bool = Field(
+        default=False,
+        alias="DEBUG"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_file_encoding="utf-8"
+        env_file_encoding="utf-8",
+        populate_by_name=True
     )
 ```
 
 ### Extended Settings
 
 ```python
+from pydantic import Field
+
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./app.db"
-    DEBUG: bool = False
+    database_url: str = Field(
+        default="sqlite:///./app.db",
+        alias="DATABASE_URL"
+    )
+    debug: bool = Field(
+        default=False,
+        alias="DEBUG"
+    )
 
     # Custom settings
-    SECRET_KEY: str = "change-me-in-production"
-    HOST: str = "127.0.0.1"
-    PORT: int = 8000
+    secret_key: str = Field(
+        default="change-me-in-production",
+        alias="SECRET_KEY"
+    )
+    host: str = Field(default="127.0.0.1", alias="HOST")
+    port: int = Field(default=8000, alias="PORT")
 
     # Nested settings
     class DatabaseConfig(BaseSettings):
@@ -75,7 +94,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True,
+        populate_by_name=True,
         extra="ignore",
     )
 ```

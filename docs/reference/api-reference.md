@@ -38,7 +38,7 @@ Get the current settings instance.
 from fastappkit.conf import get_settings
 
 settings = get_settings()
-db_url = settings.DATABASE_URL
+db_url = settings.database_url
 ```
 
 ### set_settings()

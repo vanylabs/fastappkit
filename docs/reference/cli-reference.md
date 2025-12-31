@@ -57,7 +57,7 @@ Run the development server.
 **Syntax:**
 
 ```bash
-fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--debug] [--quiet]
+fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--debug] [--quiet] [<uvicorn-options>]
 ```
 
 **Options:**
@@ -68,8 +68,9 @@ fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--de
 - `--verbose, -v`: Enable verbose output (overrides global setting)
 - `--debug`: Enable debug output (overrides global setting, includes stack traces)
 - `--quiet, -q`: Suppress output (overrides global setting)
+- `<uvicorn-options>`: Additional options are forwarded to uvicorn (e.g., `--workers`, `--log-level`, `--access-log`)
 
-**Note:** This command must be run from the project root directory (where `fastappkit.toml` is located).
+**Note:** This command must be run from the project root directory (where `fastappkit.toml` is located). All additional arguments are forwarded to uvicorn, allowing you to use any uvicorn option.
 
 **Examples:**
 
@@ -77,6 +78,9 @@ fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--de
 fastappkit core dev
 fastappkit core dev --host 0.0.0.0 --port 8080
 fastappkit core dev --reload
+fastappkit core dev --workers 4
+fastappkit core dev --log-level debug
+fastappkit core dev --access-log
 ```
 
 ## App Commands
@@ -340,7 +344,7 @@ fastappkit migrate all
 | Command | Description | Options |
 |---------|-------------|---------|
 | `fastappkit core new <name>` | Create new project | `--project-root`, `--description` |
-| `fastappkit core dev` | Run development server | `--host`, `--port`, `--reload`, `--verbose`, `--debug`, `--quiet` |
+| `fastappkit core dev` | Run development server | `--host`, `--port`, `--reload`, `--verbose`, `--debug`, `--quiet`, plus any uvicorn options |
 | `fastappkit app new <name>` | Create internal app | `--as-package` |
 | `fastappkit app list` | List all apps | `--verbose`, `--debug`, `--quiet` |
 | `fastappkit app validate <name>` | Validate app | `--json` |
