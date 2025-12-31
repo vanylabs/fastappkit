@@ -50,7 +50,7 @@ class FastAppKit:
         """
         app = FastAPI(
             title="FastAppKit Application",
-            debug=self.settings.DEBUG,
+            debug=self.settings.debug,
         )
 
         # Load apps

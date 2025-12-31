@@ -120,7 +120,12 @@ class MigrationContextBuilder:
         # External apps have their own isolated migration directories
 
         # Set database URL from settings (core project's database)
+        # Strip async drivers (e.g., +asyncpg, +aiosqlite) since Alembic doesn't support async
         settings = get_settings()
-        alembic_cfg.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+        database_url = settings.database_url
+        # Remove common async driver suffixes
+        for async_driver in ["+asyncpg", "+aiosqlite", "+asyncmy"]:
+            database_url = database_url.replace(async_driver, "")
+        alembic_cfg.set_main_option("sqlalchemy.url", database_url)
 
         return alembic_cfg

@@ -30,7 +30,7 @@ class MigrationRunner:
 
     def _get_engine(self) -> Engine:
         """Get SQLAlchemy engine from settings."""
-        return create_engine(self.settings.DATABASE_URL)
+        return create_engine(self.settings.database_url)
 
     def upgrade(
         self,

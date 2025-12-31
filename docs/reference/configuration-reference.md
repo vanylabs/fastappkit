@@ -19,8 +19,8 @@ apps = [
 
 ### App Entry Formats
 
-- `apps.<name>` → Internal app (located in `./apps/<name>/`)
-- `<package_name>` → External app (pip-installed package, must be importable)
+-   `apps.<name>` → Internal app (located in `./apps/<name>/`)
+-   `<package_name>` → External app (pip-installed package, must be importable)
 
 ### Migration Order
 
@@ -40,29 +40,48 @@ Settings are defined in `core/config.py` using Pydantic's `BaseSettings`.
 ### Basic Settings
 
 ```python
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./app.db"
-    DEBUG: bool = False
+    database_url: str = Field(
+        default="sqlite:///./app.db",
+        alias="DATABASE_URL"
+    )
+    debug: bool = Field(
+        default=False,
+        alias="DEBUG"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_file_encoding="utf-8"
+        env_file_encoding="utf-8",
+        populate_by_name=True
     )
 ```
 
 ### Extended Settings
 
 ```python
+from pydantic import Field
+
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./app.db"
-    DEBUG: bool = False
+    database_url: str = Field(
+        default="sqlite:///./app.db",
+        alias="DATABASE_URL"
+    )
+    debug: bool = Field(
+        default=False,
+        alias="DEBUG"
+    )
 
     # Custom settings
-    SECRET_KEY: str = "change-me-in-production"
-    HOST: str = "127.0.0.1"
-    PORT: int = 8000
+    secret_key: str = Field(
+        default="change-me-in-production",
+        alias="SECRET_KEY"
+    )
+    host: str = Field(default="127.0.0.1", alias="HOST")
+    port: int = Field(default=8000, alias="PORT")
 
     # Nested settings
     class DatabaseConfig(BaseSettings):
@@ -75,7 +94,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True,
+        populate_by_name=True,
         extra="ignore",
     )
 ```
@@ -84,10 +103,10 @@ class Settings(BaseSettings):
 
 **BaseSettings Configuration:**
 
-- `env_file`: Path to `.env` file (default: `.env`)
-- `env_file_encoding`: Encoding for `.env` file (default: `utf-8`)
-- `case_sensitive`: Whether environment variable names are case-sensitive (default: `False`)
-- `extra`: How to handle extra fields (`"ignore"`, `"forbid"`, `"allow"`)
+-   `env_file`: Path to `.env` file (default: `.env`)
+-   `env_file_encoding`: Encoding for `.env` file (default: `utf-8`)
+-   `case_sensitive`: Whether environment variable names are case-sensitive (default: `False`)
+-   `extra`: How to handle extra fields (`"ignore"`, `"forbid"`, `"allow"`)
 
 ### Environment Variables
 
@@ -112,5 +131,5 @@ See the [Manifest Reference](manifest-reference.md) for complete details.
 
 ## Learn More
 
-- [Configuration Guide](../guides/configuration.md) - Configuration guide
-- [Manifest Reference](manifest-reference.md) - External app manifest schema
+-   [Configuration Guide](../guides/configuration.md) - Configuration guide
+-   [Manifest Reference](manifest-reference.md) - External app manifest schema

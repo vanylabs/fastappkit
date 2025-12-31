@@ -23,10 +23,10 @@ app = kit.create_app()
 
 Create and configure FastAPI application.
 
-- Loads all apps from `fastappkit.toml`
-- Validates app manifests
-- Mounts routers with automatic prefixes
-- Returns configured FastAPI application
+-   Loads all apps from `fastappkit.toml`
+-   Validates app manifests
+-   Mounts routers with automatic prefixes
+-   Returns configured FastAPI application
 
 ## Settings API
 
@@ -38,7 +38,7 @@ Get the current settings instance.
 from fastappkit.conf import get_settings
 
 settings = get_settings()
-db_url = settings.DATABASE_URL
+db_url = settings.database_url
 ```
 
 ### set_settings()
@@ -198,5 +198,5 @@ print(sql)
 
 ## Learn More
 
-- [Architecture](../advanced/architecture.md) - System architecture
-- [Extending fastappkit](../advanced/extending-fastappkit.md) - Extension guide
+-   [Architecture](../advanced/architecture.md) - System architecture
+-   [Extending fastappkit](../advanced/extending-fastappkit.md) - Extension guide

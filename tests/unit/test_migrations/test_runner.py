@@ -27,7 +27,7 @@ class TestMigrationRunner:
         self, temp_project: Path, test_settings: TestSettings
     ) -> None:
         """upgrade() requires valid migration path."""
-        test_settings.DATABASE_URL = "sqlite:///:memory:"
+        test_settings.database_url = "sqlite:///:memory:"
         set_settings(test_settings)
 
         # Create app metadata without migrations_path
@@ -47,7 +47,7 @@ class TestMigrationRunner:
         self, temp_project: Path, test_settings: TestSettings
     ) -> None:
         """get_current_revision() handles missing migrations path gracefully."""
-        test_settings.DATABASE_URL = "sqlite:///:memory:"
+        test_settings.database_url = "sqlite:///:memory:"
         set_settings(test_settings)
 
         # Create app metadata with invalid migrations_path
@@ -68,7 +68,7 @@ class TestMigrationRunner:
         self, temp_project: Path, test_settings: TestSettings
     ) -> None:
         """upgrade() raises MigrationError on invalid migration."""
-        test_settings.DATABASE_URL = "sqlite:///:memory:"
+        test_settings.database_url = "sqlite:///:memory:"
         set_settings(test_settings)
 
         migrations_path = temp_project / "migrations"
@@ -96,14 +96,14 @@ from fastappkit.conf import get_settings
 
 config = context.config
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.database_url)
 config.set_main_option("version_table", "alembic_version")
 
 target_metadata = None
 
 def run_migrations_online():
     connectable = engine_from_config(
-        {"sqlalchemy.url": settings.DATABASE_URL},
+        {"sqlalchemy.url": settings.database_url},
         prefix="sqlalchemy.",
         poolclass=None,
     )

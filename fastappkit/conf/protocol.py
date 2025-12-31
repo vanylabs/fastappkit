@@ -18,7 +18,7 @@ class SettingsProtocol(Protocol):
     """
 
     # Database configuration
-    DATABASE_URL: str
+    database_url: str
 
     # Application settings
-    DEBUG: bool
+    debug: bool

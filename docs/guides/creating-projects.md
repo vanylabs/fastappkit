@@ -50,13 +50,14 @@ myproject/
 Start the development server:
 
 ```bash
-fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--debug] [--quiet]
+fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--debug] [--quiet] [<uvicorn-options>]
 ```
 
 ### Options
 
 -   `--host, -h`: Host to bind to (default: `127.0.0.1`)
 -   `--port, -p`: Port to bind to (default: `8000`)
+-   Additional uvicorn options: All other arguments are forwarded to uvicorn (e.g., `--workers`, `--log-level`, `--access-log`)
 -   `--reload`: Enable auto-reload on code changes
 -   `--verbose, -v`: Enable verbose output (overrides global setting)
 -   `--debug`: Enable debug output (overrides global setting, includes stack traces)

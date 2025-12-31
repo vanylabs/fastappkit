@@ -15,7 +15,7 @@ DEBUG=false
 ```
 
 !!! warning "Security"
-    Never commit `.env` files with sensitive data. Use environment variables or secure secret management systems in production.
+Never commit `.env` files with sensitive data. Use environment variables or secure secret management systems in production.
 
 ### Dependency Versions
 
@@ -38,7 +38,7 @@ fastappkit migrate all
 ```
 
 !!! tip "Migration Strategy"
-    Run migrations in a separate step before deploying application code. This ensures the database schema is ready before the new code runs.
+Run migrations in a separate step before deploying application code. This ensures the database schema is ready before the new code runs.
 
 ## Deployment Options
 
@@ -106,7 +106,7 @@ gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 ```
 
 !!! note "Development Server"
-    The `fastappkit core dev` command is intended for development only. Use a production ASGI server for production deployments.
+The `fastappkit core dev` command is intended for development only. Use a production ASGI server for production deployments.
 
 ## Monitoring and Logging
 
@@ -115,18 +115,22 @@ Configure proper logging for production:
 ```python
 # core/config.py
 import logging
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    DATABASE_URL: str
-    DEBUG: bool = False
-    LOG_LEVEL: str = "INFO"
+    database_url: str = Field(alias="DATABASE_URL")
+    debug: bool = Field(default=False, alias="DEBUG")
+    log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        populate_by_name=True
+    )
 
 # Configure logging
 logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL),
+    level=getattr(logging, settings.log_level),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 ```
@@ -148,5 +152,5 @@ def health_check():
 
 ## Learn More
 
-- [Configuration Guide](configuration.md) - Production configuration
-- [Best Practices](../advanced/best-practices.md) - Production best practices
+-   [Configuration Guide](configuration.md) - Production configuration
+-   [Best Practices](../advanced/best-practices.md) - Production best practices

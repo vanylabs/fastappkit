@@ -19,8 +19,8 @@ apps = [
 
 ### App Entry Formats
 
-- `apps.<name>` → Internal app (located in `./apps/<name>/`)
-- `<package_name>` → External app (pip-installed package, must be importable)
+-   `apps.<name>` → Internal app (located in `./apps/<name>/`)
+-   `<package_name>` → External app (pip-installed package, must be importable)
 
 ### Migration Order
 
@@ -36,6 +36,7 @@ order = ["core", "auth", "blog"]
 Settings are defined in `core/config.py` using Pydantic's `BaseSettings`:
 
 ```python
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -45,12 +46,19 @@ class Settings(BaseSettings):
     Loads from .env file automatically.
     """
 
-    DATABASE_URL: str = "sqlite:///./app.db"
-    DEBUG: bool = False
+    database_url: str = Field(
+        default="sqlite:///./app.db",
+        alias="DATABASE_URL"
+    )
+    debug: bool = Field(
+        default=False,
+        alias="DEBUG"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_file_encoding="utf-8"
+        env_file_encoding="utf-8",
+        populate_by_name=True
     )
 ```
 
@@ -59,30 +67,41 @@ class Settings(BaseSettings):
 The scaffolded code includes minimal settings. You can extend it by adding more fields:
 
 ```python
+from pydantic import Field
+
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./app.db"
-    DEBUG: bool = False
+    database_url: str = Field(
+        default="sqlite:///./app.db",
+        alias="DATABASE_URL"
+    )
+    debug: bool = Field(
+        default=False,
+        alias="DEBUG"
+    )
 
     # Add your custom settings here
-    SECRET_KEY: str = "change-me-in-production"
-    HOST: str = "127.0.0.1"
-    PORT: int = 8000
+    secret_key: str = Field(
+        default="change-me-in-production",
+        alias="SECRET_KEY"
+    )
+    host: str = Field(default="127.0.0.1", alias="HOST")
+    port: int = Field(default=8000, alias="PORT")
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True,
+        populate_by_name=True,
         extra="ignore",  # Ignore extra fields from .env
     )
 ```
 
 ### Customization Options
 
-- **Add Custom Settings:** Add fields to `Settings` class
-- **Validation:** Use Pydantic validators: `@field_validator('DATABASE_URL')`
-- **Default Values:** Set defaults in class definition
-- **Nested Settings:** Use Pydantic models for nested configuration
-- **Environment-Specific:** Override in `.env` or via environment variables
+-   **Add Custom Settings:** Add fields to `Settings` class with `Field()` instances
+-   **Validation:** Use Pydantic validators: `@field_validator('database_url')`
+-   **Default Values:** Set defaults in `Field()` instances
+-   **Nested Settings:** Use Pydantic models for nested configuration
+-   **Environment-Specific:** Override in `.env` or via environment variables (uppercase names are supported via aliases)
 
 ### Accessing Settings
 
@@ -92,7 +111,7 @@ class Settings(BaseSettings):
 from fastappkit.conf import get_settings
 
 settings = get_settings()
-db_url = settings.DATABASE_URL
+db_url = settings.database_url
 ```
 
 **FastAPI dependency injection:**
@@ -103,7 +122,7 @@ from fastapi import Depends
 from core.config import Settings
 
 def handler(settings: Settings = Depends(get_settings)):
-    return settings.DEBUG
+    return settings.debug
 ```
 
 ### Environment Variables
@@ -198,28 +217,28 @@ route_prefix = "/blog"
 ```
 
 !!! important "Manifest Requirements"
-    The manifest file is `fastappkit.toml`, not `pyproject.toml`. It must be located in the package directory (where `__init__.py` is). This ensures it's included when the package is published to PyPI. No fallback - `fastappkit.toml` is required for external apps.
+The manifest file is `fastappkit.toml`, not `pyproject.toml`. It must be located in the package directory (where `__init__.py` is). This ensures it's included when the package is published to PyPI. No fallback - `fastappkit.toml` is required for external apps.
 
 See the [Manifest Reference](../reference/manifest-reference.md) for complete details.
 
 ## Dependency Versions
 
 !!! warning "Default Dependency Versions"
-    When creating a new project or external app, dependency versions in `pyproject.toml` are set to `*` (any version) by default. This provides maximum flexibility but may lead to compatibility issues.
+When creating a new project or external app, dependency versions in `pyproject.toml` are set to `*` (any version) by default. This provides maximum flexibility but may lead to compatibility issues.
 
 ### Recommendations
 
 **For Production Projects:**
 
-- Update dependency versions to specific ranges (e.g., `>=0.120.0,<0.130`)
-- Pin exact versions for critical dependencies
-- Test thoroughly after updating versions
+-   Update dependency versions to specific ranges (e.g., `>=0.120.0,<0.130`)
+-   Pin exact versions for critical dependencies
+-   Test thoroughly after updating versions
 
 **For External Apps:**
 
-- Match dependency versions with the core project for compatibility
-- Use compatible version ranges that work with the core project's versions
-- Document minimum required versions in your app's README
+-   Match dependency versions with the core project for compatibility
+-   Use compatible version ranges that work with the core project's versions
+-   Document minimum required versions in your app's README
 
 **Example:**
 
@@ -232,9 +251,9 @@ alembic = ">=1.17.2,<1.18"
 ```
 
 !!! note "CLI Warning"
-    The CLI will display a warning message when creating projects or external apps, reminding you to update dependency versions according to your needs.
+The CLI will display a warning message when creating projects or external apps, reminding you to update dependency versions according to your needs.
 
 ## Learn More
 
-- [Configuration Reference](../reference/configuration-reference.md) - Complete configuration options
-- [Manifest Reference](../reference/manifest-reference.md) - External app manifest schema
+-   [Configuration Reference](../reference/configuration-reference.md) - Complete configuration options
+-   [Manifest Reference](../reference/manifest-reference.md) - External app manifest schema

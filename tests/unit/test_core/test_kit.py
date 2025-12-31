@@ -53,7 +53,7 @@ class TestFastAppKit:
 
             assert isinstance(app, FastAPI)
             assert app.title == "FastAppKit Application"
-            assert app.debug == test_settings.DEBUG
+            assert app.debug == test_settings.debug
         finally:
             os.chdir(original_cwd)
 
