@@ -9,6 +9,7 @@ from typing import Generator
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from fastappkit.conf import set_settings
@@ -18,14 +19,14 @@ from fastappkit.core.kit import FastAppKit
 class TestSettings(BaseSettings):
     """Test settings class that implements SettingsProtocol."""
 
-    DATABASE_URL: str = "sqlite:///:memory:"
-    DEBUG: bool = True
+    database_url: str = Field(default="sqlite:///:memory:")
+    debug: bool = Field(default=True)
     SECRET_KEY: str = "test-secret-key"
     HOST: str = "127.0.0.1"
     PORT: int = 8000
     RELOAD: bool = False
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore", populate_by_name=True)
 
 
 @pytest.fixture
@@ -71,8 +72,8 @@ def test_settings() -> TestSettings:
         TestSettings instance for testing
     """
     return TestSettings(
-        DATABASE_URL="sqlite:///:memory:",
-        DEBUG=True,
+        database_url="sqlite:///:memory:",
+        debug=True,
     )
 
 

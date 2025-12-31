@@ -4,6 +4,7 @@ Settings configuration for {{ project_name }}.
 Uses pydantic-settings to load from .env file.
 """
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,10 +15,17 @@ class Settings(BaseSettings):
     Loads from .env file automatically.
     """
 
-    DATABASE_URL: str = "sqlite:///./{{ project_name }}.db"
-    DEBUG: bool = False
+    database_url: str = Field(
+        default="sqlite:///./{{ project_name }}.db",
+        alias="DATABASE_URL"
+    )
+    debug: bool = Field(
+        default=False,
+        alias="DEBUG"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_file_encoding="utf-8"
+        env_file_encoding="utf-8",
+        populate_by_name=True
     )

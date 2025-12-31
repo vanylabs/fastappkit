@@ -65,7 +65,7 @@ from fastappkit.conf import get_settings
 
 config = context.config
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.database_url)
 config.set_main_option("version_table", "alembic_version")
 
 target_metadata = MetaData()
@@ -85,7 +85,7 @@ def run_migrations_offline():
 def run_migrations_online():
     """Run migrations in 'online' mode."""
     connectable = engine_from_config(
-        {"sqlalchemy.url": settings.DATABASE_URL},
+        {"sqlalchemy.url": settings.database_url},
         prefix="sqlalchemy.",
         poolclass=None,
     )
