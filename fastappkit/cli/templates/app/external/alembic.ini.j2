@@ -59,9 +59,18 @@ version_path_separator = os  # Use os.pathsep. Default configuration used for ne
 # are written from script.py.mako
 # output_encoding = utf-8
 
-# Database URL - can be overridden via DATABASE_URL environment variable
+# Database URL configuration
+#
+# This can be configured in three ways (in order of precedence):
+# 1. DATABASE_URL environment variable (from .env file when running independently)
+# 2. This sqlalchemy.url setting (fallback)
+# 3. Set programmatically in migrations/env.py
+#
+# For independent development, create a .env file with:
+#   DATABASE_URL=sqlite:///./{{ app_name }}.db
+#
+# The migrations/env.py will automatically read DATABASE_URL from the environment.
 # Default uses SQLite for development
-# Edit this line or set DATABASE_URL environment variable
 sqlalchemy.url = sqlite:///./{{ app_name }}.db
 
 

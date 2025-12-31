@@ -14,10 +14,12 @@ license = "MIT"
 packages = [{include = "{{ app_name }}"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<4.0"
 fastapi = "*"
 sqlalchemy = "*"
 alembic = "*"
+pydantic-settings = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 
 # Note: FastAppKit metadata is in {{ app_name }}/fastappkit.toml
 # This file is included in the package when published to PyPI
