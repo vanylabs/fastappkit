@@ -61,15 +61,16 @@ version_path_separator = os  # Use os.pathsep. Default configuration used for ne
 
 # Database URL configuration
 #
-# This can be configured in three ways (in order of precedence):
-# 1. DATABASE_URL environment variable (from .env file when running independently)
-# 2. This sqlalchemy.url setting (fallback)
-# 3. Set programmatically in migrations/env.py
+# IMPORTANT: The database URL is determined in this order (when running independently):
+# 1. App's Settings class (loads from .env file) - RECOMMENDED
+# 2. DATABASE_URL environment variable
+# 3. This sqlalchemy.url setting (fallback only)
 #
 # For independent development, create a .env file with:
 #   DATABASE_URL=sqlite:///./{{ app_name }}.db
 #
-# The migrations/env.py will automatically read DATABASE_URL from the environment.
+# The migrations/env.py will automatically use Settings to load from .env file.
+# This sqlalchemy.url is only used as a last resort fallback.
 # Default uses SQLite for development
 sqlalchemy.url = sqlite:///./{{ app_name }}.db
 

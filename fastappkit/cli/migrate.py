@@ -70,6 +70,10 @@ def core(
         if str(project_root) not in sys.path:
             sys.path.insert(0, str(project_root))
 
+        # Load registry to identify external apps (needed to exclude their tables from autogenerate)
+        loader = AppLoader(project_root)
+        registry = loader.load_all()
+
         # Try to collect metadata from core module for core migrations
         metadata_collector = MetadataCollector()
         # Try to collect from core.models only
@@ -96,6 +100,7 @@ def core(
             message,
             core_migration_path,
             target_metadata=core_metadata_obj,
+            registry=registry,  # Pass registry so external app tables can be excluded
         )
         typer.echo(f"✅ Created migration: {migration_path}")
     except Exception as e:

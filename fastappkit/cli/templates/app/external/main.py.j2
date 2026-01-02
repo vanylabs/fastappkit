@@ -16,10 +16,10 @@ _current_dir = Path(__file__).parent
 if str(_current_dir) not in sys.path:
     sys.path.insert(0, str(_current_dir))
 
-from fastapi import FastAPI
+from fastapi import FastAPI  # noqa: E402
 
-from {{ app_name }}.config import Settings
-from {{ app_name }} import register
+from {{ app_name }}.config import Settings  # noqa: E402
+from {{ app_name }} import register  # noqa: E402
 
 # Load settings from .env
 settings = Settings()
@@ -41,4 +41,4 @@ if router is not None:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
