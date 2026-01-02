@@ -112,9 +112,12 @@ alembic downgrade -1
 alembic upgrade head --sql
 ```
 
-**Database URL**: The `DATABASE_URL` is read from the `.env` file automatically. You can also:
-- Set `DATABASE_URL` environment variable (takes precedence)
-- Edit `alembic.ini` sqlalchemy.url (fallback)
+**Database URL**: The database URL is determined in this order:
+1. App's Settings class (loads from `.env` file) - **RECOMMENDED**
+2. `DATABASE_URL` environment variable
+3. `alembic.ini` sqlalchemy.url (fallback only)
+
+The app's `Settings` class automatically loads from `.env` file, so just configure your `.env` file and it will be used.
 
 ### When Using the External App in a Core Project
 

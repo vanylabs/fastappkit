@@ -14,6 +14,7 @@ from fastappkit.core.metadata import MetadataCollector
 from fastappkit.core.registry import AppMetadata
 from fastappkit.core.types import AppType
 from fastappkit.migrations.context import MigrationContextBuilder
+from fastappkit.migrations.version import VersionTableManager
 
 if TYPE_CHECKING:
     from fastappkit.core.registry import AppRegistry
@@ -79,16 +80,42 @@ class Autogenerate:
                 # External app or no registry - use only app's metadata
                 target_metadata = self.metadata_collector.collect_metadata(app_metadata)
 
+        # For core and internal app migrations (they share the same migration directory),
+        # collect external app table names to exclude from autogenerate
+        # This prevents core/internal migrations from dropping external app tables
+        external_app_tables: set[str] = set()
+        # Core and internal apps both use core/db/migrations/ and share alembic_version table
+        # So they both need to exclude external app tables
+        if app_metadata.app_type == AppType.INTERNAL and registry:
+            # Collect all external app tables and version tables
+            for ext_app in registry.get_by_type(AppType.EXTERNAL):
+                # Get external app version table
+                version_table = VersionTableManager.get_version_table(
+                    AppType.EXTERNAL, ext_app.name
+                )
+                external_app_tables.add(version_table)
+
+                # Get external app model tables
+                ext_metadata = self.metadata_collector.collect_metadata(ext_app)
+                if ext_metadata:
+                    for table_name in ext_metadata.tables.keys():
+                        external_app_tables.add(table_name)
+
         # Build Alembic config
         # For internal apps, migration_path is core/db/migrations (no special handling needed)
         alembic_cfg = self.context_builder.build_alembic_config(
             app_metadata,
             migration_path,
+            registry=registry,
         )
 
         # Set target metadata in config (for autogenerate)
         if target_metadata:
             alembic_cfg.attributes["target_metadata"] = target_metadata
+
+        # Set external app tables to exclude (for core migrations only)
+        if external_app_tables:
+            alembic_cfg.attributes["exclude_external_app_tables"] = external_app_tables
 
         # Generate migration
         try:

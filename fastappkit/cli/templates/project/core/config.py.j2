@@ -15,17 +15,9 @@ class Settings(BaseSettings):
     Loads from .env file automatically.
     """
 
-    database_url: str = Field(
-        default="sqlite:///./{{ project_name }}.db",
-        alias="DATABASE_URL"
-    )
-    debug: bool = Field(
-        default=False,
-        alias="DEBUG"
-    )
+    database_url: str = Field(default="sqlite:///./{{ app_name }}.db")
+    debug: bool = Field(default=False)
 
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        populate_by_name=True
+        env_file=".env", env_file_encoding="utf-8", populate_by_name=True
     )
