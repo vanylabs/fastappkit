@@ -79,6 +79,7 @@ nav:
           - CI/CD: CI_CD.md
     - Changelog:
           - Overview: community/index.md#changelog
+          - Version 0.2.1: changelog/0.2.1.md
           - Version 0.2.0: changelog/0.2.0.md
           - Version 0.1.9: changelog/0.1.9.md
           - Version 0.1.0: changelog/0.1.0.md
