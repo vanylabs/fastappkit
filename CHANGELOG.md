@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+-   **[0.2.2](docs/changelog/0.2.2.md)** - Brief description
 -   **[0.2.1](docs/changelog/0.2.1.md)** - Fixed migration system to prevent dropping external app tables
 -   **[0.2.0](docs/changelog/0.2.0.md)** - Enhanced external app support and configuration improvements
 -   **[0.1.9](docs/changelog/0.1.9.md)** - Documentation improvements

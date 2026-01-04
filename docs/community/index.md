@@ -42,9 +42,10 @@ View the full [LICENSE](https://github.com/vanylabs/fastappkit/blob/main/LICENSE
 The changelog tracks all notable changes to fastappkit across versions. The overview is maintained in the repository root, while detailed release notes for each version are available in the documentation.
 
 -   [Changelog Overview](https://github.com/vanylabs/fastappkit/blob/main/CHANGELOG.md) - Complete version history and release types
--   [Version 0.2.1](../changelog/0.2.1.md) - Fixed migration system to prevent dropping external app tables
--   [Version 0.2.0](../changelog/0.2.0.md) - Enhanced external app support and configuration improvements
--   [Version 0.1.9](../changelog/0.1.9.md) - Documentation improvements
--   [Version 0.1.0](../changelog/0.1.0.md) - Detailed release notes for the initial alpha release
+-   [Version 0.2.2](https://github.com/vanylabs/fastappkit/blob/main/docs/changelog/0.2.2.md) - Brief description
+-   [Version 0.2.1](https://github.com/vanylabs/fastappkit/blob/main/docs/changelog/0.2.1.md) - Fixed migration system to prevent dropping external app tables
+-   [Version 0.2.0](https://github.com/vanylabs/fastappkit/blob/main/docs/changelog/0.2.0.md) - Enhanced external app support and configuration improvements
+-   [Version 0.1.9](https://github.com/vanylabs/fastappkit/blob/main/docs/changelog/0.1.9.md) - Documentation improvements
+-   [Version 0.1.0](https://github.com/vanylabs/fastappkit/blob/main/docs/changelog/0.1.0.md) - Detailed release notes for the initial alpha release
 
 For detailed changelog entries for each version, see the [Changelog section](../changelog/0.2.1.md) in the documentation.

@@ -75,7 +75,6 @@ main (production-ready)
 -   `fastappkit/__init__.py` - Manual update to match
 -   `docs/changelog/X.X.X.md` - Create new changelog file
 -   `CHANGELOG.md` (repo root) - Add version to Version History
--   `mkdocs.yml` - Add version to Changelog navigation
 -   `docs/community/index.md` - Add version to Changelog section
 
 **Process:**
@@ -85,7 +84,6 @@ poetry version patch  # or minor/major
 # Manually update fastappkit/__init__.py to match
 # Create docs/changelog/X.X.X.md
 # Update CHANGELOG.md (repo root)
-# Update mkdocs.yml navigation
 # Update docs/community/index.md
 ```
 
@@ -132,14 +130,7 @@ poetry version patch  # or minor/major
     # -   **[0.1.1](docs/changelog/0.1.1.md)** - Brief description
     ```
 
-    c. **Update `mkdocs.yml` navigation:**
-
-    ```bash
-    # Add to Changelog section in nav (place newest version first):
-    # - Version 0.1.1: changelog/0.1.1.md
-    ```
-
-    d. **Update `docs/community/index.md`:**
+    c. **Update `docs/community/index.md`:**
 
     ```bash
     # Add to the Changelog section (place newest version first):
@@ -150,7 +141,7 @@ poetry version patch  # or minor/major
 
     ```bash
     git add pyproject.toml fastappkit/__init__.py \
-            docs/changelog/ CHANGELOG.md mkdocs.yml docs/community/index.md
+            docs/changelog/ CHANGELOG.md docs/community/index.md
     git commit -m "chore: prepare release v0.1.1"
     ```
 
