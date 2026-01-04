@@ -14,6 +14,7 @@ copyright: Copyright &copy; 2025 VanyLabs
 # Theme
 theme:
     name: readthedocs
+    custom_dir: docs/overrides
 
 # Exclude temp directory from processing
 exclude_docs: |
