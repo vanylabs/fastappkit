@@ -1,39 +1,33 @@
 # Creating Apps
 
-This guide covers creating and managing apps in fastappkit projects.
+Detailed guide to creating internal and external apps.
 
 ## Internal Apps
 
-Internal apps are project-specific modules that live in your project's `apps/` directory.
-
-### Create an Internal App
+### Command
 
 ```bash
 fastappkit app new <name>
 ```
 
-This command must be run from the project root directory (where `fastappkit.toml` is located).
+**IMPORTANT**: Must be run from project root (where `fastappkit.toml` is located).
 
 ### What Gets Created
 
 ```
 apps/<name>/
-├── __init__.py      # register(app: FastAPI) function
-├── models.py        # SQLAlchemy models
-└── router.py        # FastAPI routers
+├── __init__.py    # register() function
+├── models.py      # SQLAlchemy models (imports Base from core.models)
+└── router.py      # FastAPI router
 ```
 
-!!! important "Migration Directory"
-Internal apps do NOT have their own `migrations/` directory. They use the core's migration directory (`core/db/migrations/`).
+### Structure Explanation
 
-### Entrypoint Patterns
+#### `apps/<name>/__init__.py`
 
-fastappkit supports two patterns for registering routers:
-
-#### Pattern 1: Return Router (Recommended)
+Contains the `register()` function:
 
 ```python
-# apps/blog/__init__.py
 from fastapi import APIRouter, FastAPI
 from fastappkit.conf import get_settings
 
@@ -43,213 +37,307 @@ router = APIRouter()
 def list_posts():
     return [{"id": 1, "title": "Hello"}]
 
-def register(app: FastAPI) -> APIRouter:
+def register(app: FastAPI) -> APIRouter | None:
     """Register this app with the FastAPI application."""
-    settings = get_settings()  # Access settings
-    # Return router - fastappkit will mount it with prefix from manifest
+    settings = get_settings()
+    return router  # Return router for auto-mount, or None for manual mount
+```
+
+**Signature**: `register(app: FastAPI) -> APIRouter | None`
+-   Return `APIRouter` for auto-mount
+-   Return `None` for manual mount (app handles mounting itself)
+
+#### `apps/<name>/models.py`
+
+SQLAlchemy models:
+
+```python
+from core.models import Base
+from sqlalchemy import Column, Integer, String
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    content = Column(String)
+```
+
+**CRITICAL**: Must import `Base` from `core.models`, not create own.
+
+#### `apps/<name>/router.py`
+
+FastAPI router:
+
+```python
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/")
+def read_root():
+    return {"message": "Hello from blog app"}
+```
+
+### Registration Function
+
+The `register()` function is called by fastappkit when loading apps:
+
+```python
+def register(app: FastAPI) -> APIRouter | None:
+    """
+    Register this app with the FastAPI application.
+
+    Args:
+        app: FastAPI application instance
+
+    Returns:
+        APIRouter if app should auto-mount router, None for manual mount
+    """
+    # Access settings if needed
+    settings = get_settings()
+
+    # Return router for auto-mount
     return router
+
+    # Or return None for manual mount
+    # app.include_router(router, prefix="/custom")
+    # return None
 ```
 
-#### Pattern 2: Mount Router Yourself
+### Models
+
+**CRITICAL**: Internal apps must import `Base` from `core.models`:
 
 ```python
-# apps/blog/__init__.py
-from fastapi import APIRouter, FastAPI
-from fastappkit.conf import get_settings
+from core.models import Base  # CORRECT
+```
+
+**NOT**:
+```python
+from sqlalchemy.orm import DeclarativeBase
+class Base(DeclarativeBase):  # WRONG for internal apps
+    pass
+```
+
+**Allowed**:
+-   Can import models from other internal apps
+-   Can import from `core.models`
+-   Cannot import from external apps
+
+### Router Creation
+
+Create routes in `router.py`:
+
+```python
+from fastapi import APIRouter
+from apps.blog.models import Post
 
 router = APIRouter()
 
 @router.get("/posts")
 def list_posts():
-    return [{"id": 1, "title": "Hello"}]
+    return {"posts": []}
 
-def register(app: FastAPI) -> None:
-    """Register this app with the FastAPI application."""
-    settings = get_settings()  # Access settings
-    # Mount router yourself - fastappkit will skip mounting
-    app.include_router(router, prefix="/blog")
-    # Can also use custom prefix, tags, dependencies, etc.
-    # app.include_router(router, prefix="/api/blog", tags=["blog"])
+@router.post("/posts")
+def create_post():
+    return {"message": "Post created"}
 ```
 
-### Customization Options
-
--   **Access Settings:** Use `get_settings()` to access configuration
--   **Custom Prefix:** Override manifest `route_prefix` by mounting yourself
--   **Router Tags:** Add tags when mounting: `app.include_router(router, tags=["blog"])`
--   **Dependencies:** Add dependencies: `app.include_router(router, dependencies=[Depends(...)])`
--   **Startup/Shutdown Events:** Register events: `@app.on_event("startup")`
--   **Middleware:** Add middleware in `register()`: `app.add_middleware(...)`
--   **Background Tasks:** Register background tasks: `app.add_task(...)`
--   **Exception Handlers:** Add exception handlers: `app.add_exception_handler(...)`
+**IMPORTANT**: Automatically added to `fastappkit.toml` by CLI.
 
 ## External Apps
 
-External apps are reusable packages that can be installed via pip and plugged into any fastappkit project.
-
-### Create an External App
+### Command
 
 ```bash
 fastappkit app new <name> --as-package
 ```
 
-The `--as-package` flag is required for external apps.
-
-This command must be run from the project root directory (where `fastappkit.toml` is located).
+Can be run anywhere (not required to be in project root).
 
 ### What Gets Created
 
 ```
 <name>/
-├── <name>/              # Package directory (nested structure)
-│   ├── __init__.py
-│   ├── models.py
-│   ├── router.py
+├── <name>/              # Package directory
+│   ├── __init__.py      # register() function
+│   ├── models.py        # SQLAlchemy models (own Base class)
+│   ├── router.py        # FastAPI router
+│   ├── config.py        # Settings (for independent development)
 │   ├── fastappkit.toml  # Manifest (in package directory)
-│   └── migrations/      # Migrations (in package directory)
-│       ├── env.py       # Alembic env (isolated)
+│   └── migrations/      # Isolated migrations
+│       ├── env.py
 │       ├── script.py.mako
 │       └── versions/
-├── pyproject.toml       # Package metadata (Poetry/pip)
-├── alembic.ini         # For independent development
+├── pyproject.toml       # Package metadata
+├── alembic.ini          # For independent development
+├── .env                 # Environment variables (for independent development)
 └── README.md
 ```
 
-### External App Manifest
+### Structure Explanation
 
-External apps must declare metadata in `fastappkit.toml` located inside the package directory:
+#### `<name>/<name>/__init__.py`
 
-**Location:** `<app_name>/<app_name>/fastappkit.toml`
+Same `register()` function signature as internal apps.
 
-**Example:**
+#### `<name>/<name>/models.py`
 
-```toml
-name = "blog"
-version = "0.1.0"
-entrypoint = "blog:register"
-migrations = "migrations"
-models_module = "blog.models"
-route_prefix = "/blog"
+**CRITICAL**: External apps must use own `Base` class:
+
+```python
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Column, Integer, String
+
+# CRITICAL: External apps must use own Base class
+class Base(DeclarativeBase):
+    pass
+
+class Payment(Base):
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True)
+    amount = Column(Integer)
 ```
 
-!!! important "Manifest Location"
-The manifest is stored in `fastappkit.toml` inside the package directory (`<name>/<name>/fastappkit.toml`), not in `pyproject.toml`. This ensures it's included when the package is published to PyPI. Internal apps do not need a manifest file - their metadata is inferred from the directory structure.
-
-### Required Manifest Fields
-
--   `name`: App name (string)
--   `version`: Semantic version (string)
--   `entrypoint`: Dotted path to register function (e.g., `"blog:register"`)
--   `migrations`: Path to migrations directory (relative to package directory, typically `"migrations"`)
--   `models_module`: Dotted path to models module (recommended)
-
-### Optional Manifest Fields
-
--   `route_prefix`: Router prefix (default: `/<appname>`)
-
-See the [Manifest Reference](../reference/manifest-reference.md) for complete details.
-
-## Using External Apps
-
-External apps must be installed via `pip` (editable or non-editable) and then added to `fastappkit.toml`:
-
-### Step 1: Install the External App
-
-```bash
-# For published packages
-pip install external-app-name
-
-# For local development (editable install)
-pip install -e /path/to/external-app
-
-# Or add to requirements.txt/pyproject.toml dependencies
+**NOT**:
+```python
+from core.models import Base  # WRONG for external apps
 ```
 
-### Step 2: Add to `fastappkit.toml`
+**Restricted**:
+-   Cannot import from core or internal apps
+-   Isolation enforced by validation
 
-Edit `fastappkit.toml` and add the app to the `apps` list:
+#### `<name>/<name>/fastappkit.toml`
+
+Manifest file (in package directory):
 
 ```toml
 [tool.fastappkit]
-apps = [
-  "apps.blog",           # Internal app
-  "external_app_name",   # External app (package name)
-]
+name = "payments"
+version = "0.1.0"
+entrypoint = "payments:register"
+migrations = "migrations"
+models_module = "payments.models"
+route_prefix = "/payments"
 ```
 
-### App Resolution
+**Location**: Must be in package directory, not project root.
 
-The resolver tries methods in this order:
+#### `<name>/<name>/migrations/`
 
-1. **Internal app pattern**: `"apps.<name>"` - checks if entry starts with `apps.` and resolves to `./apps/<name>/`
-2. **Package name** (dotted import): `"external_app_name"` - tries to import as Python module using `importlib.import_module()`
+Isolated migrations directory:
+-   Has its own `env.py` with isolated version table
+-   Version table: `alembic_version_<appname>`
+-   Not shared with core or other apps
 
-!!! important "Pip Installation Required"
-External apps must be pip-installed. Filesystem paths are not supported. For local development, use `pip install -e /path/to/app` to install the package in editable mode.
+### Independent Development Setup
 
-## Listing Apps
+#### 1. Install Package
 
-List all apps in your project:
+**CRITICAL**: External apps MUST be pip-installed:
 
 ```bash
-fastappkit app list [--verbose] [--debug] [--quiet]
+cd <name>
+pip install -e .
 ```
 
-### Options
+#### 2. Configure `.env`
 
--   `--verbose, -v`: Show detailed information (import path, migrations path, etc.)
--   `--debug`: Show debug information
--   `--quiet, -q`: Suppress output
-
-This command must be run from the project root directory.
-
-### Output
-
-Shows all apps (internal and external) with:
-
--   Name
--   Type (internal/external)
--   Route prefix
-
-**Verbose output includes:**
-
--   Import path
--   Filesystem path (if applicable)
--   Migrations path
--   Manifest details
-
-## Validating Apps
-
-Validate an app's structure and configuration:
+Edit `.env` file in external app directory:
 
 ```bash
-fastappkit app validate <name> [--json]
+DATABASE_URL=sqlite:///./payments.db
+DEBUG=false
 ```
 
-### Options
+#### 3. Use Alembic Directly
 
--   `--json`: Output results as JSON (CI-friendly)
+**CRITICAL**: External apps cannot use `fastappkit migrate`. Use Alembic directly:
 
-This command must be run from the project root directory.
+```bash
+alembic revision --autogenerate -m "initial"
+alembic upgrade head
+```
 
-### What Gets Validated
+#### 4. Test Independently
 
--   Manifest presence and correctness (required fields, format)
--   Entrypoint importability and signature
--   Migration folder existence (external apps)
--   Version table configuration (external apps)
--   Isolation rules (external apps cannot import internal apps)
--   Duplicate app names (warns if multiple entries resolve to same name)
+```bash
+uvicorn main:app --reload
+```
 
-### Output
+Uses external app's `.env` and `DATABASE_URL`.
 
--   Human-readable by default (shows errors and warnings)
--   JSON format with `--json` flag (includes `valid`, `errors`, `warnings` arrays)
--   Exit code 1 if validation fails (useful for CI/CD)
+## Best Practices
 
-## Learn More
+### Naming Conventions
 
--   [Internal Apps](../topics/internal-apps.md) - Deep dive into internal apps
--   [External Apps](../topics/external-apps.md) - Understanding external apps
--   [App Isolation](../topics/app-isolation.md) - Isolation rules and constraints
--   [Router Mounting](../topics/router-mounting.md) - How routers are mounted
+-   Use lowercase with underscores: `blog`, `user_auth`, `payment_processing`
+-   Alphanumeric, hyphens, and underscores only
+-   Avoid Python keywords
+-   Keep names descriptive but concise
+
+### App Organization
+
+**Internal Apps:**
+-   One app per feature/domain
+-   Group related functionality together
+-   Use clear, descriptive names
+
+**External Apps:**
+-   Design for reusability
+-   Keep dependencies minimal
+-   Document requirements clearly
+
+### When to Use Internal vs External
+
+**Use Internal Apps When:**
+-   Feature is project-specific
+-   You need shared migrations
+-   You want tight integration with core
+
+**Use External Apps When:**
+-   Component is reusable across projects
+-   You want isolated migrations
+-   You plan to publish to PyPI
+-   Component should be independent
+
+## Common Issues
+
+### Missing `__init__.py`
+
+**Error**: `AppLoadError: App directory is not a Python package`
+
+**Solution**: Ensure `apps/<name>/__init__.py` exists (created by CLI, but verify if manual).
+
+### External App Not Pip-Installed
+
+**Error**: `ImportError` or `AppLoadError: Could not resolve app entry`
+
+**Solution**: Install package: `pip install -e .` (even for local development).
+
+### Wrong `Base` Class in External App
+
+**Error**: Isolation validation error
+
+**Solution**: External apps must use own `Base` class (DeclarativeBase), not `core.models.Base`.
+
+### Missing Manifest for External App
+
+**Error**: `AppLoadError: Failed to load manifest`
+
+**Solution**: Ensure `fastappkit.toml` exists in package directory (`<app>/<app>/fastappkit.toml`).
+
+### Duplicate App Names
+
+**Warning**: `Duplicate app names detected`
+
+**Solution**: Rename one of the apps or check if multiple entries resolve to same name.
+
+## Next Steps
+
+-   [Migrations](migrations.md) - Create and manage migrations
+-   [Development Workflow](development-workflow.md) - Day-to-day development
+-   [External App Manifest](../configuration/external-app-manifest.md) - Manifest reference

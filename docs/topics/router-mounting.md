@@ -1,151 +1,181 @@
 # Router Mounting
 
-fastappkit automatically mounts app routers with configurable prefixes.
+How routers are automatically mounted in fastappkit applications.
 
-## Architecture
+## Automatic Mounting
 
-```
-┌───────────────────── FastAPI app ───────────────────────┐
-│                                                         │
-│   /core/...                                             │
-│                                                         │
-│   /blog/...              <-- internal apps              │
-│   /account/...                                          │
-│                                                         │
-│   /fastapi_blog/...      <-- external apps              │
-│   /fastapi_store/...                                    │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+If `register()` returns `APIRouter`, it's automatically mounted by fastappkit:
+
+```python
+def register(app: FastAPI) -> APIRouter:
+    return router  # Auto-mounted with prefix
 ```
 
-## Default Prefix
+The prefix comes from:
+1. Manifest `route_prefix` (if specified)
+2. Default `/<appname>` (if not specified)
 
-The default prefix is `/<appname>`:
+## Route Prefixes
 
-- `apps.blog` → `/blog`
-- `fastapi_payments` → `/fastapi_payments`
+### Default Prefix
 
-## Override Methods
+If not specified in manifest, default is `/<appname>`:
 
-### Via Manifest
+```python
+# App name: "blog"
+# Default prefix: "/blog"
+```
+
+### Custom Prefix
+
+Specify in manifest:
 
 ```toml
-# In fastappkit.toml (external apps) or inferred (internal apps)
+# fastappkit.toml (external app)
 route_prefix = "/api/blog"
 ```
 
-### Via Register Function
+Or in internal app, you can mount manually:
 
 ```python
 def register(app: FastAPI) -> None:
-    # Mount with custom prefix, tags, dependencies
-    app.include_router(
-        router,
-        prefix="/api/v1/blog",
-        tags=["blog", "content"],
-        dependencies=[Depends(require_auth)]
-    )
+    app.include_router(router, prefix="/api/blog")
+    return None  # Manual mount
 ```
 
-### Empty Prefix
+### Empty Prefix (Root Mount)
+
+Use empty string to mount at root level:
 
 ```toml
 route_prefix = ""  # Mounts at root level
 ```
 
-## Customization Options
+**Use with caution**: Can cause route collisions.
 
-- **Tags:** Add OpenAPI tags: `tags=["blog", "content"]`
-- **Dependencies:** Add route dependencies: `dependencies=[Depends(...)]`
-- **Response Class:** Customize response: `response_class=CustomResponse`
-- **Prefix Override:** Override manifest prefix in `register()`
-- **Multiple Routers:** Mount multiple routers from same app
-- **Sub-applications:** Mount sub-applications: `app.mount("/static", StaticFiles(...))`
+## Registration Function
+
+### Auto-Mount
+
+Return `APIRouter` from `register()`:
+
+```python
+def register(app: FastAPI) -> APIRouter:
+    """Register this app with the FastAPI application."""
+    return router  # Auto-mounted with prefix from manifest
+```
+
+### Manual Mount
+
+Return `None` and mount yourself:
+
+```python
+def register(app: FastAPI) -> None:
+    """Register this app with the FastAPI application."""
+    app.include_router(router, prefix="/custom/prefix")
+    return None  # Manual mount, fastappkit skips
+```
+
+## Mount Order
+
+Apps are mounted in order from `fastappkit.toml`:
+
+```toml
+[tool.fastappkit]
+apps = [
+  "apps.blog",      # Mounted first
+  "apps.auth",      # Mounted second
+  "payments",        # Mounted third
+]
+```
+
+Route collision detection runs **after** all mounts.
 
 ## Route Collision Detection
 
-fastappkit automatically detects overlapping routes (same path + method):
-
-- Emits warnings (not fatal) - startup continues
-- Shows which apps have conflicting routes
-- Provides suggestions for resolution
-- Developer responsibility to fix collisions
-
-### Example Collision
-
-If two apps use the same prefix:
+fastappkit detects route collisions and emits warnings (not fatal):
 
 ```
-ROUTE COLLISIONS DETECTED
-🔴 Collision between apps: blog, news
-   App 'blog' uses prefix: /api
-   App 'news' uses prefix: /api
+⚠️  ROUTE COLLISIONS DETECTED
 
-   Conflicting routes (2 found):
-     • GET    /api/posts
-     • POST   /api/posts
+   Route '/api' used by multiple apps:
+   - blog (prefix: /api)
+   - auth (prefix: /api)
+
+   💡 Fix: Change route_prefix for one of the apps
 ```
 
-## Entrypoint Patterns
+**Detection:**
+-   Checks for overlapping route paths
+-   Warns but doesn't fail
+-   Developer responsibility to fix
 
-### Function-based
+## Examples
+
+### Auto-Mount with Default Prefix
 
 ```python
-def register(app: FastAPI) -> APIRouter | None:
-    """Register app with FastAPI application.
+# apps/blog/__init__.py
+router = APIRouter()
 
-    Can return APIRouter (fastappkit mounts it) or None (mount yourself).
-    """
-    settings = get_settings()
-    # Option 1: Return router
-    return router
-    # Option 2: Mount yourself
-    # app.include_router(router, prefix="/blog")
-    # return None
+@router.get("/posts")
+def list_posts():
+    return []
+
+def register(app: FastAPI) -> APIRouter:
+    return router  # Auto-mounted at "/blog"
 ```
 
-### Class-based
+### Auto-Mount with Custom Prefix
+
+```toml
+# External app manifest
+route_prefix = "/api/blog"
+```
 
 ```python
-class App:
-    def register(self, app: FastAPI) -> APIRouter | None:
-        """Register app with FastAPI application."""
-        settings = get_settings()
-        app.include_router(router, prefix="/blog")
-        return None  # Or return router
+def register(app: FastAPI) -> APIRouter:
+    return router  # Auto-mounted at "/api/blog"
 ```
 
-### Entrypoint String Formats
+### Manual Mount
 
-- `"blog:register"` - Function in module
-- `"blog:App"` - Class (must have `register` method)
-- `"blog"` - Defaults to `"blog:register"`
-- `"blog.main:register"` - Function in submodule
+```python
+def register(app: FastAPI) -> None:
+    app.include_router(router, prefix="/custom/prefix", tags=["blog"])
+    return None  # Manual mount
+```
 
-The loader instantiates class-based apps with no constructor arguments.
+## Common Issues
 
-## What `register()` Can Do
+### Route Collisions
 
-- Return `APIRouter` - fastappkit mounts it with prefix
-- Mount routers yourself - fastappkit skips mounting
-- Register startup/shutdown events: `@app.on_event("startup")`
-- Add middleware: `app.add_middleware(...)`
-- Add exception handlers: `app.add_exception_handler(...)`
-- Add background tasks: `app.add_task(...)`
-- Access settings via `get_settings()`
-- Mount sub-applications: `app.mount(...)`
-- Add dependencies, tags, etc. when mounting routers
+**Warning**: `Route collision detected`
 
-## What `register()` Must Not Do
+**Solution**: Check `route_prefix` in manifests:
+```toml
+# Change one app's prefix
+route_prefix = "/api/blog"  # Instead of "/blog"
+```
 
-- Modify global FastAPI state outside its namespace
-- Perform blocking operations at import time
-- Connect to DB directly (use startup events instead)
-- Access settings via global variables (use `get_settings()`)
-- Raise exceptions that prevent other apps from loading
+### Duplicate App Names
+
+**Warning**: `Duplicate app names detected`
+
+**Problem**: May cause route conflicts
+
+**Solution**: Rename one of the apps.
+
+### Router Not Mounting
+
+**Problem**: Routes not accessible
+
+**Solution**:
+-   Check `register()` returns `APIRouter` (for auto-mount)
+-   Or verify manual mount in `register()` function
+-   Check app is in `fastappkit.toml`
 
 ## Learn More
 
-- [Creating Apps](../guides/creating-apps.md) - How to create apps with routers
-- [Internal Apps](internal-apps.md) - Internal app router patterns
-- [External Apps](external-apps.md) - External app router patterns
+-   [Creating Apps](../guides/creating-apps.md) - App creation guide
+-   [CLI Reference](../reference/cli-reference.md) - Command reference

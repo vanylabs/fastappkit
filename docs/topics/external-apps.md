@@ -1,15 +1,15 @@
 # External Apps
 
-External apps are reusable packages that can be installed via pip and plugged into any fastappkit project.
+Deep dive into external apps - reusable packages that can be installed via pip and plugged into any fastappkit project.
 
 ## Characteristics
 
-- Installed via `pip install <package>` (must be pip-installed, no filesystem paths)
-- Independent Python packages
-- Must be schema-independent
-- Cannot depend on internal apps
-- Use per-app version tables (`alembic_version_<appname>`)
-- Perfect for reusable plugins
+-   Installed via `pip install <package>` (must be pip-installed, no filesystem paths)
+-   Independent Python packages
+-   Must be schema-independent
+-   Cannot depend on internal apps
+-   Use per-app version tables (`alembic_version_<appname>`)
+-   Perfect for reusable plugins
 
 ## Structure
 
@@ -33,11 +33,12 @@ External apps are reusable packages that can be installed via pip and plugged in
 
 External apps must declare metadata in `fastappkit.toml` located inside the package directory.
 
-**Location:** `<app_name>/<app_name>/fastappkit.toml`
+**Location**: `<app_name>/<app_name>/fastappkit.toml`
 
 **Example:**
 
 ```toml
+[tool.fastappkit]
 name = "blog"
 version = "0.1.0"
 entrypoint = "blog:register"
@@ -46,7 +47,7 @@ models_module = "blog.models"
 route_prefix = "/blog"
 ```
 
-See the [Manifest Reference](../reference/manifest-reference.md) for complete details.
+See the [Manifest Reference](../reference/configuration-reference.md) for complete details.
 
 ## Models
 
@@ -55,6 +56,7 @@ External apps must use their own `Base` class (isolated metadata):
 ```python
 # <name>/<name>/models.py
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Column, Integer, String
 
 class Base(DeclarativeBase):
     pass
@@ -89,6 +91,8 @@ def register(app: FastAPI) -> APIRouter:
     settings = get_settings()
     return router
 ```
+
+**Signature**: Same as internal apps: `register(app: FastAPI) -> APIRouter | None`
 
 ## Installation
 
@@ -129,13 +133,49 @@ From the core project, you can apply existing migrations:
 fastappkit migrate app <name> upgrade
 ```
 
+**Version Table**: Each external app uses `alembic_version_<appname>` (isolated).
+
 ## Publishing
 
 External apps can be published to PyPI. The `fastappkit.toml` manifest is included in the package, ensuring it's available when installed.
 
+**Requirements:**
+-   Manifest must be in package directory
+-   Migrations must be included in package
+-   `__init__.py` must exist in package directory
+
+## Best Practices
+
+1. **Design for reusability**
+   -   Keep dependencies minimal
+   -   Avoid project-specific code
+   -   Document requirements clearly
+
+2. **Isolation**
+   -   Use own Base class
+   -   Don't import from core or internal apps
+   -   Keep migrations isolated
+
+3. **Versioning**
+   -   Use semantic versioning
+   -   Document breaking changes
+   -   Match dependency versions with core project
+
+4. **Documentation**
+   -   Clear README
+   -   Installation instructions
+   -   Usage examples
+
+## Limitations
+
+-   **Must be pip-installed** (no filesystem paths)
+-   **Cannot depend on internal apps** (isolation rule)
+-   **Isolated migrations** (cannot share with core)
+-   **Independent development** (migrations created separately)
+
 ## Learn More
 
-- [Creating Apps](../guides/creating-apps.md) - How to create external apps
-- [Migration System](migration-system.md) - How migrations work for external apps
-- [App Isolation](app-isolation.md) - Isolation rules and constraints
-- [Manifest Reference](../reference/manifest-reference.md) - Complete manifest schema
+-   [Creating Apps](../guides/creating-apps.md) - How to create external apps
+-   [Migration System](migration-system.md) - How migrations work for external apps
+-   [App Isolation](app-isolation.md) - Isolation rules and constraints
+-   [Manifest Reference](../configuration/external-app-manifest.md) - Complete manifest schema

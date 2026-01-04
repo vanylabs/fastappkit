@@ -50,6 +50,12 @@ fastappkit core new myproject --project-root /path/to/projects
 fastappkit core new myproject --description "My API project"
 ```
 
+**Notes:**
+
+-   Creates complete project structure
+-   Generates `fastappkit.toml`, `core/`, `apps/`, etc.
+-   Creates `.env` file with defaults
+
 ### `fastappkit core dev`
 
 Run the development server.
@@ -57,7 +63,7 @@ Run the development server.
 **Syntax:**
 
 ```bash
-fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--debug] [--quiet] [<uvicorn-options>]
+fastappkit core dev [--host <host>] [--port <port>] [--reload] [<uvicorn-options>]
 ```
 
 **Options:**
@@ -65,12 +71,7 @@ fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--de
 -   `--host, -h <host>`: Host to bind to (default: `127.0.0.1`)
 -   `--port, -p <port>`: Port to bind to (default: `8000`)
 -   `--reload`: Enable auto-reload on code changes
--   `--verbose, -v`: Enable verbose output (overrides global setting)
--   `--debug`: Enable debug output (overrides global setting, includes stack traces)
--   `--quiet, -q`: Suppress output (overrides global setting)
 -   `<uvicorn-options>`: Additional options are forwarded to uvicorn (e.g., `--workers`, `--log-level`, `--access-log`)
-
-**Note:** This command must be run from the project root directory (where `fastappkit.toml` is located). All additional arguments are forwarded to uvicorn, allowing you to use any uvicorn option.
 
 **Examples:**
 
@@ -82,6 +83,12 @@ fastappkit core dev --workers 4
 fastappkit core dev --log-level debug
 fastappkit core dev --access-log
 ```
+
+**Notes:**
+
+-   Must be run from project root directory (where `fastappkit.toml` is located)
+-   All additional arguments are forwarded to uvicorn
+-   Uses core project's `DATABASE_URL` from `.env`
 
 ## App Commands
 
@@ -103,14 +110,18 @@ fastappkit app new <name> [--as-package]
 
 -   `--as-package`: Create as external package (required for external apps)
 
-**Note:** This command must be run from the project root directory (where `fastappkit.toml` is located).
-
 **Examples:**
 
 ```bash
 fastappkit app new blog
 fastappkit app new payments --as-package
 ```
+
+**Notes:**
+
+-   Must be run from project root directory (for internal apps)
+-   Internal apps are automatically added to `fastappkit.toml`
+-   External apps must be pip-installed: `pip install -e .`
 
 ### `fastappkit app list`
 
@@ -128,14 +139,17 @@ fastappkit app list [--verbose] [--debug] [--quiet]
 -   `--debug`: Show debug information
 -   `--quiet, -q`: Suppress output
 
-**Note:** This command must be run from the project root directory.
-
 **Examples:**
 
 ```bash
 fastappkit app list
 fastappkit app list --verbose
 ```
+
+**Notes:**
+
+-   Must be run from project root directory
+-   Shows app name, type (internal/external), and route prefix
 
 ### `fastappkit app validate`
 
@@ -155,14 +169,18 @@ fastappkit app validate <name> [--json]
 
 -   `--json`: Output results as JSON (CI-friendly)
 
-**Note:** This command must be run from the project root directory.
-
 **Examples:**
 
 ```bash
 fastappkit app validate blog
 fastappkit app validate payments --json
 ```
+
+**Notes:**
+
+-   Must be run from project root directory
+-   Validates manifest, isolation, and migrations
+-   Returns exit code 1 if validation fails
 
 ## Migration Commands
 
@@ -180,13 +198,16 @@ fastappkit migrate core -m <message>
 
 -   `-m, --message <message>`: Migration message (required)
 
-**Note:** This command must be run from the project root directory.
-
 **Examples:**
 
 ```bash
 fastappkit migrate core -m "Add session table"
 ```
+
+**Notes:**
+
+-   Must be run from project root directory
+-   Creates migration in `core/db/migrations/versions/`
 
 ### `fastappkit migrate app`
 
@@ -201,74 +222,60 @@ fastappkit migrate app <name> <action> [options]
 **Arguments:**
 
 -   `<name>`: App name (required)
--   `<action>`: Migration action (required)
-
-**Actions:**
-
--   `makemigrations`: Generate new migration (internal apps only)
--   `upgrade`: Apply migrations (external apps only)
--   `downgrade`: Revert migrations (external apps only)
--   `preview`: Show SQL without executing (external apps only)
+-   `<action>`: Action to perform (required)
+    -   `makemigrations` - Create migration (internal apps only)
+    -   `upgrade` - Apply migrations (external apps)
+    -   `downgrade` - Downgrade migrations (external apps)
+    -   `preview` - Preview SQL (external apps)
 
 **Options:**
 
--   `-m, --message <message>`: Migration message (required for `makemigrations`)
--   `--revision, -r <rev>`: Specific revision (default: `head` for upgrade/preview)
-
-**Note:** This command must be run from the project root directory.
-
-**Limitations:**
-
--   Internal apps can only use `makemigrations` action. For preview/upgrade/downgrade, use unified commands (`fastappkit migrate preview/upgrade/downgrade`).
--   External apps cannot use `makemigrations` from the core project. Migrations must be created in the external app's own directory using `alembic` directly.
-
-**Error Scenarios:**
-
--   If external app has no migration files, the command will fail with instructions on how to create migrations independently.
--   If revision is not found, the command will fail with helpful error messages.
--   If app is not found in registry, the command will fail with app name error.
+-   `--revision, -r <revision>`: Specific revision (for upgrade/downgrade/preview)
+-   `-m, --message <message>`: Migration message (for makemigrations)
 
 **Examples:**
 
 ```bash
-# Internal app - create migration
+# Internal app: create migration
 fastappkit migrate app blog makemigrations -m "Add post model"
 
-# External app - upgrade
+# External app: apply migrations
 fastappkit migrate app payments upgrade
 
-# External app - upgrade to specific revision
-fastappkit migrate app payments upgrade --revision abc123
+# External app: preview SQL
+fastappkit migrate app payments preview --revision head
 
-# External app - preview SQL
-fastappkit migrate app payments preview
-
-# External app - downgrade (revision required)
-fastappkit migrate app payments downgrade abc123
+# External app: downgrade
+fastappkit migrate app payments downgrade --revision abc123
 ```
 
-### `fastappkit migrate preview`
+**Notes:**
 
-Preview SQL for core + internal app migrations (dry-run).
+-   Must be run from project root directory
+-   `makemigrations` only works for internal apps
+-   External apps must create migrations independently using `alembic`
+
+### `fastappkit migrate all`
+
+Apply all migrations in order: core + internal apps → external apps.
 
 **Syntax:**
 
 ```bash
-fastappkit migrate preview [--revision <rev>]
+fastappkit migrate all
 ```
-
-**Options:**
-
--   `--revision, -r <rev>`: Specific revision (default: `head`)
-
-**Note:** This command must be run from the project root directory.
 
 **Examples:**
 
 ```bash
-fastappkit migrate preview
-fastappkit migrate preview --revision abc123
+fastappkit migrate all
 ```
+
+**Notes:**
+
+-   Must be run from project root directory
+-   Execution order: Core → Internal apps (skipped, already in core) → External apps
+-   Recommended command for normal workflows
 
 ### `fastappkit migrate upgrade`
 
@@ -277,14 +284,12 @@ Apply core + internal app migrations.
 **Syntax:**
 
 ```bash
-fastappkit migrate upgrade [--revision <rev>]
+fastappkit migrate upgrade [--revision <revision>]
 ```
 
 **Options:**
 
--   `--revision, -r <rev>`: Specific revision (default: `head`)
-
-**Note:** This command must be run from the project root directory.
+-   `--revision, -r <revision>`: Specific revision (default: `head`)
 
 **Examples:**
 
@@ -293,9 +298,14 @@ fastappkit migrate upgrade
 fastappkit migrate upgrade --revision abc123
 ```
 
+**Notes:**
+
+-   Must be run from project root directory
+-   Applies migrations from shared directory (`core/db/migrations/`)
+
 ### `fastappkit migrate downgrade`
 
-Revert core + internal app migrations.
+Downgrade core + internal app migrations.
 
 **Syntax:**
 
@@ -307,53 +317,61 @@ fastappkit migrate downgrade <revision>
 
 -   `<revision>`: Revision to downgrade to (required)
 
-**Note:** This command must be run from the project root directory.
-
 **Examples:**
 
 ```bash
 fastappkit migrate downgrade abc123
 ```
 
-### `fastappkit migrate all`
+**Notes:**
 
-Apply all migrations in the correct order.
+-   Must be run from project root directory
+-   Downgrades migrations from shared directory
+
+### `fastappkit migrate preview`
+
+Preview SQL for core + internal app migrations.
 
 **Syntax:**
 
 ```bash
-fastappkit migrate all
+fastappkit migrate preview [--revision <revision>]
 ```
 
-**Note:** This command must be run from the project root directory.
+**Options:**
 
-**Execution Order:**
-
-1. Core migrations (always first)
-2. Internal apps (in config order) - skipped (already included in core migrations)
-3. External apps (in config order)
+-   `--revision, -r <revision>`: Specific revision (default: `head`)
 
 **Examples:**
 
 ```bash
-fastappkit migrate all
+fastappkit migrate preview
+fastappkit migrate preview --revision abc123
 ```
 
-## Command Reference Table
+**Notes:**
 
-| Command                              | Description            | Options                                                                                     |
-| ------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------- |
-| `fastappkit core new <name>`         | Create new project     | `--project-root`, `--description`                                                           |
-| `fastappkit core dev`                | Run development server | `--host`, `--port`, `--reload`, `--verbose`, `--debug`, `--quiet`, plus any uvicorn options |
-| `fastappkit app new <name>`          | Create internal app    | `--as-package`                                                                              |
-| `fastappkit app list`                | List all apps          | `--verbose`, `--debug`, `--quiet`                                                           |
-| `fastappkit app validate <name>`     | Validate app           | `--json`                                                                                    |
-| `fastappkit migrate core`            | Core migrations        | `-m, --message`                                                                             |
-| `fastappkit migrate app <name>`      | App migrations         | `makemigrations`, `upgrade`, `downgrade`, `preview`                                         |
-| `fastappkit migrate preview`         | Preview SQL            | `--revision`                                                                                |
-| `fastappkit migrate upgrade`         | Upgrade migrations     | `--revision`                                                                                |
-| `fastappkit migrate downgrade <rev>` | Downgrade migrations   | (revision required)                                                                         |
-| `fastappkit migrate all`             | Apply all migrations   | (no options)                                                                                |
+-   Must be run from project root directory
+-   Shows SQL without applying migrations
+-   Useful for reviewing changes before applying
+
+## Command Summary
+
+| Command | Purpose | Must Run From Project Root |
+|---------|---------|----------------------------|
+| `fastappkit core new <name>` | Create new project | No |
+| `fastappkit core dev` | Run development server | Yes |
+| `fastappkit app new <name>` | Create internal app | Yes |
+| `fastappkit app new <name> --as-package` | Create external app | No |
+| `fastappkit app list` | List all apps | Yes |
+| `fastappkit app validate <name>` | Validate app | Yes |
+| `fastappkit migrate core -m "msg"` | Create core migration | Yes |
+| `fastappkit migrate app <name> makemigrations -m "msg"` | Create app migration | Yes (internal only) |
+| `fastappkit migrate app <name> upgrade` | Apply app migration | Yes (external) |
+| `fastappkit migrate all` | Apply all migrations | Yes |
+| `fastappkit migrate upgrade` | Apply core + internal | Yes |
+| `fastappkit migrate downgrade <rev>` | Downgrade | Yes |
+| `fastappkit migrate preview` | Preview SQL | Yes |
 
 ## Learn More
 

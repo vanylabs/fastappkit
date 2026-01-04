@@ -1,141 +1,125 @@
 # Best Practices
 
-Guidelines for developing with fastappkit.
+Recommended patterns and practices for fastappkit projects.
 
 ## Project Organization
 
-### Directory Structure
+### App Design
 
-Follow the standard fastappkit project structure:
+1. **One app per feature/domain**
+   -   Keep apps focused on a single responsibility
+   -   Group related functionality together
+   -   Use clear, descriptive names
 
-```
-myproject/
-├── core/                    # Core project code
-│   ├── config.py           # Settings
-│   ├── app.py              # App factory
-│   ├── models.py           # Core models (optional)
-│   └── db/
-│       └── migrations/     # Core migrations
-├── apps/                    # Internal apps
-│   ├── blog/
-│   └── auth/
-├── fastappkit.toml         # Project config
-├── .env                    # Environment variables
-└── main.py                 # Entry point
-```
+2. **Clear boundaries**
+   -   Keep app boundaries clear
+   -   Minimize cross-app dependencies
+   -   Use internal apps for tightly coupled features
 
-### App Organization
+3. **External apps for reusability**
+   -   Design external apps to be reusable
+   -   Keep dependencies minimal
+   -   Document requirements clearly
 
-- Keep apps focused on a single domain
-- Use clear, descriptive app names
-- Follow consistent naming conventions
-- Keep app code organized (models, routers, etc.)
-
-## Settings Management
-
-### Environment Variables
-
-- Never commit `.env` files with sensitive data
-- Use environment variables for production
-- Document required environment variables
-- Use different `.env` files for different environments
-
-### Settings Validation
-
-- Use Pydantic validators for custom validation
-- Provide sensible defaults
-- Validate required settings at startup
-
-## Migrations
-
-### Migration Best Practices
-
-1. **Keep migrations in VCS:** Always commit migration files
-2. **Test migrations:** Test upgrades and downgrades
-3. **Review SQL:** Use `preview` to review SQL before applying
-4. **Small migrations:** Keep migrations focused and small
-5. **Reversible:** Ensure migrations can be reversed
-
-### Migration Naming
-
-Use descriptive migration messages:
-
-```bash
-fastappkit migrate app blog makemigrations -m "Add post model with title and content"
-```
-
-## App Development
+## Migration Strategies
 
 ### Internal Apps
 
-- Use internal apps for project-specific features
-- Share models between internal apps when appropriate
-- Keep apps loosely coupled
+1. **Keep migrations focused**
+   -   One migration per logical change
+   -   Clear migration messages
+   -   Review migrations before applying
+
+2. **Use migration order when needed**
+   -   Only if internal apps have dependencies
+   -   Document dependencies clearly
+
+3. **Test migrations**
+   -   Test upgrades in development
+   -   Test downgrades to ensure reversibility
+   -   Review SQL with `fastappkit migrate preview`
 
 ### External Apps
 
-- Keep external apps truly independent
-- Document dependencies clearly
-- Test external apps in isolation
-- Follow semantic versioning
+1. **Version migrations**
+   -   Include migrations in package
+   -   Version migrations with app version
+   -   Document migration requirements
+
+2. **Test independently**
+   -   Test migrations in external app project
+   -   Test integration with core project
+   -   Ensure compatibility
+
+## Settings Management
+
+1. **Use environment variables**
+   -   Never hardcode sensitive values
+   -   Use `.env` for development
+   -   Use environment variables in production
+
+2. **Validate settings**
+   -   Use Pydantic validators
+   -   Provide clear error messages
+   -   Set appropriate defaults
+
+3. **Document custom settings**
+   -   Document all custom settings
+   -   Explain purpose and usage
+   -   Provide examples
+
+## Testing Strategies
+
+1. **Test apps independently**
+   -   Test external apps in isolation
+   -   Test internal apps with core
+   -   Test integration
+
+2. **Use validation**
+   -   Run `fastappkit app validate` regularly
+   -   Fix validation errors immediately
+   -   Review warnings
+
+3. **Test migrations**
+   -   Test upgrades and downgrades
+   -   Test in development first
+   -   Backup before production migrations
+
+## Performance Considerations
+
+1. **Lazy loading**
+   -   Apps are loaded on startup
+   -   Minimize startup overhead
+   -   Use async where appropriate
+
+2. **Database connections**
+   -   Use connection pooling
+   -   Configure appropriately for your database
+   -   Monitor connection usage
+
+3. **Route organization**
+   -   Keep routes organized
+   -   Use appropriate prefixes
+   -   Avoid deep nesting
 
 ## Security
 
-### Secrets Management
+1. **Settings security**
+   -   Never commit `.env` files
+   -   Use secure secret management
+   -   Rotate secrets regularly
 
-- Never hardcode secrets
-- Use environment variables for sensitive data
-- Use secure secret management in production
+2. **Dependency management**
+   -   Update dependency versions regularly
+   -   Pin versions for production
+   -   Review security advisories
 
-### Input Validation
-
-- Validate all inputs
-- Use Pydantic models for request validation
-- Sanitize user inputs
-
-## Performance
-
-### Database Queries
-
-- Use proper indexing
-- Avoid N+1 queries
-- Use eager loading when appropriate
-
-### Caching
-
-- Cache expensive operations
-- Use appropriate cache invalidation strategies
-
-## Testing
-
-### Test Organization
-
-- Keep tests organized by app
-- Use fixtures for common setup
-- Test both unit and integration scenarios
-
-### Migration Testing
-
-- Test migrations in both directions
-- Test with sample data
-- Test edge cases
-
-## Documentation
-
-### Code Documentation
-
-- Document public APIs
-- Use type hints
-- Write clear docstrings
-
-### User Documentation
-
-- Keep documentation up to date
-- Provide examples
-- Document edge cases
+3. **Input validation**
+   -   Validate all inputs
+   -   Use Pydantic models
+   -   Sanitize user input
 
 ## Learn More
 
-- [Creating Apps](../guides/creating-apps.md) - App development guide
-- [Migrations](../guides/migrations.md) - Migration workflows
-- [Configuration](../guides/configuration.md) - Configuration guide
+-   [Architecture](architecture.md) - Internal architecture
+-   [Extending FastAppKit](extending-fastappkit.md) - Customization guide

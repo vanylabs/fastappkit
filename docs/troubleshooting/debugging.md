@@ -1,132 +1,285 @@
 # Debugging
 
-Techniques for debugging fastappkit applications.
+Debugging techniques for fastappkit applications.
 
-## Verbose and Debug Output
+## Using `--debug` Flag
 
-### Enable Verbose Output
-
-```bash
-fastappkit app list --verbose
-fastappkit core dev --verbose
-```
-
-Shows detailed information about operations.
-
-### Enable Debug Output
-
-```bash
-fastappkit app list --debug
-fastappkit core dev --debug
-```
-
-Shows debug information including stack traces.
-
-## App Validation
-
-Validate apps to check for issues:
-
-```bash
-fastappkit app validate <name>
-```
-
-For JSON output (useful for CI/CD):
-
-```bash
-fastappkit app validate <name> --json
-```
-
-## Migration Preview
-
-Preview SQL before applying migrations:
-
-```bash
-# Core + internal apps
-fastappkit migrate preview
-
-# External app
-fastappkit migrate app <name> preview
-```
-
-## Database Inspection
-
-Check database state:
-
-```sql
--- Core & internal apps version
-SELECT * FROM alembic_version;
-
--- External app version
-SELECT * FROM alembic_version_<appname>;
-
--- Check tables
-SELECT table_name FROM information_schema.tables
-WHERE table_schema = 'public';
-```
-
-## App Registry Inspection
-
-Start dev server with debug to see app loading details:
+Enable debug output to see detailed error information:
 
 ```bash
 fastappkit core dev --debug
+fastappkit app validate <name> --debug
+fastappkit migrate all --debug
 ```
 
-Check logs for:
+**What you get:**
+-   Stack traces
+-   Detailed error messages
+-   Full exception information
+-   Internal state information
 
-- App resolution steps
-- App registration steps
-- Router mounting details
-- Validation results
+## Logging Configuration
 
-## Python Debugger
-
-Use Python debugger for code inspection:
-
-```python
-import pdb; pdb.set_trace()
-```
-
-Or use breakpoints in your IDE.
-
-## Logging
-
-Configure logging for detailed output:
+Configure logging in `core/app.py`:
 
 ```python
 import logging
 
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.DEBUG if settings.debug else logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
 )
 ```
 
-## Common Debugging Scenarios
+### Log Levels
 
-### App Not Loading
+-   **DEBUG**: Detailed information for debugging
+-   **INFO**: General information
+-   **WARNING**: Warning messages
+-   **ERROR**: Error messages
+-   **CRITICAL**: Critical errors
 
-1. Check app exists: `fastappkit app list`
-2. Validate app: `fastappkit app validate <name>`
-3. Check logs: `fastappkit core dev --debug`
-4. Verify manifest (external apps)
-5. Check entrypoint import
+## Common Error Messages
 
-### Migration Issues
+### `AppLoadError`
 
-1. Preview SQL: `fastappkit migrate preview`
-2. Check database state (SQL queries above)
-3. Verify migration files exist
-4. Check migration order in config
+**Format**: `AppLoadError: Failed to load app '<name>' at stage '<stage>'`
 
-### Router Not Mounted
+**Stages:**
+-   `resolve`: App entry couldn't be resolved
+-   `manifest`: Manifest loading failed
+-   `entrypoint`: Entrypoint loading failed
+-   `register`: Registration execution failed
+-   `router`: Router mounting failed
 
-1. Check app is loaded: `fastappkit app list`
-2. Verify route prefix
-3. Check for route collisions
-4. Inspect app registry with debug output
+**Debugging:**
+1. Run `fastappkit app validate <name> --debug`
+2. Check specific stage mentioned in error
+3. Verify app structure matches requirements
+
+### `ConfigError`
+
+**Format**: `ConfigError: <message>`
+
+**Common causes:**
+-   `fastappkit.toml` not found
+-   Invalid TOML syntax
+-   Missing `[tool.fastappkit]` section
+
+**Debugging:**
+1. Verify you're in project root
+2. Check `fastappkit.toml` exists
+3. Validate TOML syntax
+
+### `ImportError`
+
+**Format**: `ImportError: <module>`
+
+**Common causes:**
+-   Missing `__init__.py`
+-   Package not installed
+-   Incorrect import path
+
+**Debugging:**
+1. Check `__init__.py` files exist
+2. Verify package is installed: `pip list`
+3. Check import path is correct
+
+## Stack Trace Analysis
+
+### Reading Stack Traces
+
+1. **Top of trace**: Most recent call (where error occurred)
+2. **Bottom of trace**: Original call site
+3. **Look for**: Your code (not library code) for clues
+
+### Common Patterns
+
+**Settings not initialized:**
+```
+AttributeError: 'NoneType' object has no attribute 'database_url'
+```
+→ Settings not initialized in `core/app.py`
+
+**App not found:**
+```
+AppLoadError: Could not resolve app entry
+```
+→ App not pip-installed or path incorrect
+
+**Migration error:**
+```
+alembic.util.exc.CommandError: Can't locate revision
+```
+→ Migration file missing or database out of sync
+
+## Validation Debugging
+
+### Run Validation
+
+```bash
+fastappkit app validate <name> --debug
+```
+
+### Check Each Stage
+
+1. **Manifest validation**: Required fields, format
+2. **Isolation validation**: Import analysis
+3. **Migration validation**: Directory structure, version table
+
+### JSON Output
+
+For CI/CD integration:
+
+```bash
+fastappkit app validate <name> --json
+```
+
+Returns structured JSON with errors and warnings.
+
+## Migration Debugging
+
+### Preview SQL
+
+Before applying migrations:
+
+```bash
+fastappkit migrate preview
+```
+
+Shows SQL that would be executed.
+
+### Check Database State
+
+```sql
+-- Core + internal apps
+SELECT * FROM alembic_version;
+
+-- External apps
+SELECT * FROM alembic_version_<appname>;
+```
+
+### Check Migration Files
+
+```bash
+# Core + internal
+ls -la core/db/migrations/versions/
+
+# External app
+ls -la <app>/<app>/migrations/versions/
+```
+
+### Common Migration Issues
+
+**Revision not found:**
+-   Check migration files exist
+-   Verify database state matches files
+-   Check `down_revision` references
+
+**Version table mismatch:**
+-   External apps: Check `migrations/env.py` uses `alembic_version_<appname>`
+-   Core/internal: Check uses `alembic_version`
+
+## App Loading Debugging
+
+### Check App Resolution
+
+```bash
+fastappkit app list --verbose
+```
+
+Shows:
+-   Import path
+-   Filesystem path
+-   Migrations path
+-   Route prefix
+
+### Verify App Structure
+
+**Internal app:**
+```bash
+ls -la apps/<name>/
+# Should have: __init__.py, models.py, router.py
+```
+
+**External app:**
+```bash
+ls -la <app>/<app>/
+# Should have: __init__.py, models.py, router.py, fastappkit.toml
+```
+
+### Check Imports
+
+```python
+# Test import manually
+python -c "import apps.blog"
+python -c "import payments"
+```
+
+## Settings Debugging
+
+### Verify Settings Loaded
+
+```python
+from fastappkit.conf import get_settings
+
+try:
+    settings = get_settings()
+    print(f"Database URL: {settings.database_url}")
+except Exception as e:
+    print(f"Settings not loaded: {e}")
+```
+
+### Check Environment Variables
+
+```bash
+# Check .env file
+cat .env
+
+# Check environment variables
+env | grep DATABASE_URL
+```
+
+### Verify Settings Initialization
+
+Check `core/app.py`:
+
+```python
+# Must have this
+settings = Settings()
+kit = FastAppKit(settings=settings)
+app = kit.create_app()
+```
+
+## Route Debugging
+
+### Check Route Collisions
+
+```bash
+fastappkit core dev --debug
+# Look for route collision warnings
+```
+
+### Verify Router Mounting
+
+```python
+# In core/app.py, after kit.create_app()
+for route in app.routes:
+    print(f"{route.path} - {route.methods}")
+```
+
+### Check Route Prefixes
+
+```bash
+fastappkit app list --verbose
+# Shows route prefix for each app
+```
 
 ## Learn More
 
-- [Common Issues](common-issues.md) - Common problems and solutions
-- [CLI Reference](../reference/cli-reference.md) - Command options
+-   [Common Issues](common-issues.md) - Solutions to frequent problems
+-   [CLI Reference](../reference/cli-reference.md) - All commands

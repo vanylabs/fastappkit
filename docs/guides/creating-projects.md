@@ -1,86 +1,235 @@
 # Creating Projects
 
-This guide covers creating and managing fastappkit projects.
+Detailed guide to creating new fastappkit projects.
 
-## Create a New Project
-
-Use the `core new` command to create a new project:
+## Command
 
 ```bash
 fastappkit core new <name> [--project-root <path>] [--description <text>]
 ```
 
-### Options
+## Options
 
--   `--project-root`: Directory to create project in (default: current working directory)
--   `--description`: Project description
+### `--project-root <path>`
 
-### Behavior
+Directory to create project in.
 
-If `--project-root` is not specified, the project is created in the current working directory. The project name becomes a subdirectory.
+**Default**: Current working directory
 
-### What Gets Created
+**Example:**
+```bash
+fastappkit core new myproject --project-root /path/to/projects
+```
 
-The command creates:
+### `--description <text>`
 
--   Project directory structure
--   `fastappkit.toml` configuration file
--   `.env` file with `DATABASE_URL` placeholder
--   Core application files (`core/app.py`, `core/config.py`, etc.)
--   `main.py` entry point
+Project description.
 
-### Project Structure
+**Example:**
+```bash
+fastappkit core new myproject --description "My API project"
+```
+
+## What Gets Created
+
+### Directory Structure
 
 ```
 myproject/
 ├── core/
-│   ├── config.py          # Settings (loads from .env)
+│   ├── __init__.py
+│   ├── config.py          # Settings (BaseSettings from .env)
+│   ├── models.py          # SQLAlchemy Base class
 │   ├── app.py             # create_app() factory
-│   ├── models.py          # Core models (optional)
 │   └── db/
 │       └── migrations/    # Core migrations
-├── apps/                  # Internal apps directory
+│           ├── env.py
+│           ├── script.py.mako
+│           └── versions/
+├── apps/                  # Internal apps directory (empty)
 ├── fastappkit.toml        # Project configuration
 ├── .env                   # Environment variables
-└── main.py                # Entry point
+├── .gitignore
+├── main.py                # Entry point
+├── pyproject.toml         # Package metadata
+└── README.md
 ```
 
-## Running Development Server
+### File Descriptions
 
-Start the development server:
+#### `core/config.py`
+
+Settings class using Pydantic's `BaseSettings`:
+-   Loads from `.env` file automatically
+-   Required: `database_url`, `debug`
+-   Can be extended with custom settings
+
+#### `core/models.py`
+
+SQLAlchemy Base class (DeclarativeBase):
+-   Used by internal apps for models
+-   Can add core models here (shared infrastructure)
+
+#### `core/app.py`
+
+FastAPI app factory:
+-   Initializes `Settings` and `FastAppKit`
+-   Creates and configures FastAPI app
+-   Can be customized (middleware, exception handlers, etc.)
+
+#### `core/db/migrations/`
+
+Alembic migration directory:
+-   Shared by core and internal apps
+-   Contains `env.py` (Alembic configuration)
+-   `versions/` directory for migration files
+
+#### `fastappkit.toml`
+
+Project configuration:
+-   Lists apps (internal and external)
+-   Optional migration order override
+-   Initially empty `apps` array
+
+#### `.env`
+
+Environment variables:
+-   Auto-created with defaults
+-   `DATABASE_URL` and `DEBUG` settings
+-   Add custom settings as needed
+
+#### `main.py`
+
+Application entry point:
+-   Imports `app` from `core.app`
+-   Can be run directly: `python main.py`
+-   Or with uvicorn: `uvicorn main:app --reload`
+
+## Post-Creation Steps
+
+### 1. Install Dependencies
 
 ```bash
-fastappkit core dev [--host <host>] [--port <port>] [--reload] [--verbose] [--debug] [--quiet] [<uvicorn-options>]
+cd myproject
+poetry install
+# or
+pip install -e .
 ```
 
-### Options
+### 2. Update Dependency Versions
 
--   `--host, -h`: Host to bind to (default: `127.0.0.1`)
--   `--port, -p`: Port to bind to (default: `8000`)
--   Additional uvicorn options: All other arguments are forwarded to uvicorn (e.g., `--workers`, `--log-level`, `--access-log`)
--   `--reload`: Enable auto-reload on code changes
--   `--verbose, -v`: Enable verbose output (overrides global setting)
--   `--debug`: Enable debug output (overrides global setting, includes stack traces)
--   `--quiet, -q`: Suppress output (overrides global setting)
+**IMPORTANT**: Dependency versions in `pyproject.toml` default to `*`. Update them:
 
-!!! note "Project Root Required"
-This command must be run from the project root directory (where `fastappkit.toml` is located).
+```toml
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+fastapi = ">=0.120.0,<0.130"  # Specific range instead of *
+sqlalchemy = ">=2.0,<3.0"
+alembic = ">=1.17.2,<1.18"
+```
 
-### Behavior
+### 3. Configure Settings
 
--   Loads all apps from `fastappkit.toml`
--   Mounts routers with automatic prefixes
--   Starts uvicorn server
--   Hot-reloads on code changes (if `--reload` is set)
--   With `--reload`, uses import string (`main:app`) for proper reloading
--   Without `--reload`, creates app object directly for faster startup
+Edit `.env` file:
 
-## Project Configuration
+```bash
+DATABASE_URL=sqlite:///./myproject.db
+DEBUG=false
+```
 
-Projects are configured via `fastappkit.toml`. See the [Configuration Guide](configuration.md) for details.
+Add any custom settings to `core/config.py` if needed.
+
+### 4. First Migration (Optional)
+
+If you have core models, create a migration:
+
+```bash
+fastappkit migrate core -m "initial"
+fastappkit migrate all
+```
+
+## Customization
+
+### Modifying `core/app.py`
+
+Add middleware, exception handlers, etc.:
+
+```python
+from core.config import Settings
+from fastappkit.core.kit import FastAppKit
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+settings = Settings()
+kit = FastAppKit(settings=settings)
+app = kit.create_app()
+
+# Customize FastAPI app
+app.title = "My Custom API"
+app.version = "1.0.0"
+app.description = "Custom API description"
+
+# Add middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+### Adding Custom Settings
+
+Edit `core/config.py`:
+
+```python
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    database_url: str = Field(default="sqlite:///./app.db")
+    debug: bool = Field(default=False)
+
+    # Add custom settings
+    secret_key: str = Field(default="", alias="SECRET_KEY")
+    api_key: str = Field(default="", alias="API_KEY")
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        populate_by_name=True
+    )
+```
+
+### Custom FastAPI App Settings
+
+Modify `core/app.py` to customize the FastAPI app instance:
+
+```python
+app = kit.create_app()
+
+# Customize app metadata
+app.title = "My API"
+app.version = "1.0.0"
+app.description = "API description"
+app.terms_of_service = "https://example.com/terms"
+app.contact = {
+    "name": "API Support",
+    "email": "support@example.com",
+}
+
+# Add custom OpenAPI tags
+app.openapi_tags = [
+    {
+        "name": "users",
+        "description": "User management operations",
+    },
+]
+```
 
 ## Next Steps
 
--   [Create your first app](creating-apps.md)
--   [Configure your project](configuration.md)
--   [Set up migrations](../topics/migration-system.md)
+-   [Creating Apps](creating-apps.md) - Create your first app
+-   [Migrations](migrations.md) - Manage database schema
+-   [Configuration](../configuration/index.md) - Configure your project
