@@ -15,6 +15,10 @@ copyright: Copyright &copy; 2025 VanyLabs
 theme:
     name: readthedocs
 
+# Exclude temp directory from processing
+exclude_docs: |
+    temp/**
+
 # Extra CSS
 extra_css:
     - stylesheets/extra.css
@@ -26,8 +30,6 @@ plugins:
     - git-revision-date-localized:
           enable_creation_date: true
           type: date
-          fallback_to_build_date: true
-          strict: false
 
 # Markdown extensions
 markdown_extensions:
