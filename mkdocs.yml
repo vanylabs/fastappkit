@@ -15,6 +15,10 @@ copyright: Copyright &copy; 2025 VanyLabs
 theme:
     name: readthedocs
 
+# Extra CSS
+extra_css:
+    - stylesheets/extra.css
+
 # Plugins
 plugins:
     - search:
@@ -22,6 +26,8 @@ plugins:
     - git-revision-date-localized:
           enable_creation_date: true
           type: date
+          fallback_to_build_date: true
+          strict: false
 
 # Markdown extensions
 markdown_extensions:
@@ -50,11 +56,21 @@ nav:
           - Installation: getting-started/installation.md
           - Quick Start: getting-started/quickstart.md
           - Core Concepts: getting-started/core-concepts.md
+    - Usage Scenarios:
+          - Overview: usage/index.md
+          - Scaffolding Only: usage/scaffolding-only.md
+          - Internal Apps: usage/internal-apps.md
+          - Full Ecosystem: usage/full-ecosystem.md
+    - Configuration:
+          - Overview: configuration/index.md
+          - Project Configuration: configuration/project-config.md
+          - Settings: configuration/settings.md
+          - External App Manifest: configuration/external-app-manifest.md
     - Guides:
           - Creating Projects: guides/creating-projects.md
           - Creating Apps: guides/creating-apps.md
           - Migrations: guides/migrations.md
-          - Configuration: guides/configuration.md
+          - Development Workflow: guides/development-workflow.md
           - Deployment: guides/deployment.md
     - Topics:
           - Internal Apps: topics/internal-apps.md
@@ -65,7 +81,6 @@ nav:
     - Reference:
           - CLI Reference: reference/cli-reference.md
           - Configuration Reference: reference/configuration-reference.md
-          - Manifest Reference: reference/manifest-reference.md
           - API Reference: reference/api-reference.md
     - Advanced:
           - Architecture: advanced/architecture.md
@@ -75,16 +90,3 @@ nav:
           - Common Issues: troubleshooting/common-issues.md
           - Debugging: troubleshooting/debugging.md
     - Community: community/index.md
-    - Development:
-          - CI/CD: CI_CD.md
-    - Changelog:
-          - Overview: community/index.md#changelog
-          - Version 0.2.1: changelog/0.2.1.md
-          - Version 0.2.0: changelog/0.2.0.md
-          - Version 0.1.9: changelog/0.1.9.md
-          - Version 0.1.0: changelog/0.1.0.md
-
-# Extra
-extra:
-    version:
-        provider: readthedocs

@@ -2,6 +2,11 @@
 
 fastappkit requires Python 3.11 or higher. It is tested with Python 3.11 and 3.12.
 
+## Prerequisites
+
+-   Python 3.11 or higher
+-   pip or Poetry for package management
+
 ## Install with pip
 
 ```bash
@@ -22,11 +27,11 @@ After installation, verify that fastappkit is correctly installed:
 fastappkit --version
 ```
 
-This should display the installed version number.
+This should display the installed version number (e.g., `fastappkit 0.2.1`).
 
 ## Requirements
 
-fastappkit has the following dependencies:
+fastappkit has the following dependencies (automatically installed):
 
 -   Python 3.11+ (tested with Python 3.11 and 3.12)
 -   FastAPI 0.120.0+
@@ -50,3 +55,35 @@ fastappkit --version
 ```
 
 See the [Contributing Guide](../community/index.md#contributing) for more details on setting up a development environment.
+
+## Troubleshooting
+
+### Installation Fails
+
+If installation fails, check:
+
+-   Python version: `python --version` (must be 3.11+)
+-   pip/poetry is up to date: `pip install --upgrade pip` or `poetry self update`
+-   Virtual environment is activated (if using one)
+
+### Command Not Found
+
+If `fastappkit` command is not found after installation:
+
+-   Ensure the Python environment where fastappkit was installed is in your PATH
+-   If using a virtual environment, activate it: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
+-   If using Poetry, use `poetry run fastappkit` or activate the Poetry shell: `poetry shell`
+
+### Version Check Fails
+
+If `fastappkit --version` shows an error:
+
+-   Verify installation: `pip show fastappkit` or `poetry show fastappkit`
+-   Reinstall if needed: `pip install --upgrade fastappkit`
+
+## Next Steps
+
+Once installed, proceed to:
+
+-   [Quick Start](quickstart.md) - Create your first project
+-   [Core Concepts](core-concepts.md) - Understand how fastappkit works

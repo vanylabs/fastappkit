@@ -1,0 +1,78 @@
+/* Custom styles for mkdocs readthedocs theme */
+
+/* Bottom sidebar section - Repository info and navigation */
+/* Only style colors and appearance, don't change positioning */
+.rst-versions,
+.rst-current-version {
+    background-color: #1f1f1f !important;
+    border-top: 1px solid #3a3a3a !important;
+    color: #ffffff !important;
+}
+
+.rst-versions .rst-other-versions {
+    color: #cccccc !important;
+}
+
+.rst-versions .rst-other-versions dd a {
+    color: #4a9eff !important;
+}
+
+.rst-versions .rst-other-versions dd a:hover {
+    color: #6bb3ff !important;
+}
+
+/* Repository name/link styling */
+.rst-current-version {
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
+    padding: 10px 15px !important;
+}
+
+.rst-current-version .fa-book,
+.rst-current-version .icon-book {
+    color: #4a9eff !important;
+}
+
+/* Previous/Next navigation at bottom */
+.rst-footer-buttons {
+    background-color: #1f1f1f !important;
+    border-top: 1px solid #3a3a3a !important;
+    padding: 10px 15px !important;
+}
+
+.rst-footer-buttons a {
+    color: #4a9eff !important;
+    text-decoration: none !important;
+}
+
+.rst-footer-buttons a:hover {
+    color: #6bb3ff !important;
+    text-decoration: underline !important;
+}
+
+/* Ensure proper spacing and alignment */
+.rst-versions,
+.rst-current-version,
+.rst-footer-buttons {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+/* Fix any overflow issues - but don't change positioning */
+.rst-versions {
+    overflow-y: auto !important;
+    max-height: 200px !important;
+}
+
+/* Style the version selector if present */
+.rst-versions select {
+    background-color: #2a2a2a !important;
+    color: #ffffff !important;
+    border: 1px solid #3a3a3a !important;
+    padding: 5px 10px !important;
+    border-radius: 3px !important;
+}
+
+.wy-nav-side {
+    padding-bottom: 50px !important;
+}

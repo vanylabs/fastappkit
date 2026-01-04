@@ -1,10 +1,10 @@
 # Common Issues
 
-Solutions to common problems when using fastappkit.
+Solutions to frequent problems when using fastappkit.
 
 ## App Fails to Load
 
-**Error:** `AppLoadError: Failed to load app 'blog'`
+**Error**: `AppLoadError: Failed to load app 'blog'`
 
 ### Check List
 
@@ -25,14 +25,14 @@ Check error message for specific stage (resolve/load/register).
 
 ### Common Causes
 
-- Missing `__init__.py` in app directory
-- Incorrect entrypoint path in manifest
-- Import errors in app code
-- Missing dependencies
+-   Missing `__init__.py` in app directory
+-   Incorrect entrypoint path in manifest
+-   Import errors in app code
+-   Missing dependencies
 
 ## Migration Revision Not Found
 
-**Error:** `Can't locate revision identified by '0d037769d7fb'`
+**Error**: `Can't locate revision identified by '0d037769d7fb'`
 
 ### Possible Causes
 
@@ -55,7 +55,7 @@ Ensure using core project's `DATABASE_URL` (not external app's).
 
 ## Route Collisions
 
-**Warning:** `Route collision detected: /api used by multiple apps`
+**Warning**: `Route collision detected: /api used by multiple apps`
 
 ### Solution
 
@@ -77,7 +77,7 @@ Ensure each app has unique prefix.
 
 ## External App Cannot Create Migrations
 
-**Error:** `Cannot create migrations for external app`
+**Error**: `Cannot create migrations for external app`
 
 ### Explanation
 
@@ -94,7 +94,7 @@ fastappkit migrate app <name> upgrade
 
 ## Settings Not Loaded
 
-**Error:** Settings-related errors at runtime
+**Error**: Settings-related errors at runtime
 
 ### Solution
 
@@ -114,23 +114,23 @@ For CLI commands, ensure you're in the project root directory.
 
 ## Import Errors
 
-**Error:** `ModuleNotFoundError` or import-related errors
+**Error**: `ModuleNotFoundError` or import-related errors
 
 ### Common Causes
 
-- Missing `__init__.py` files
-- Incorrect Python path
-- Missing dependencies
+-   Missing `__init__.py` files
+-   Incorrect Python path
+-   Missing dependencies
 
 ### Solution
 
-- Ensure all app directories have `__init__.py`
-- Check that dependencies are installed
-- Verify Python path includes project root
+-   Ensure all app directories have `__init__.py`
+-   Check that dependencies are installed
+-   Verify Python path includes project root
 
 ## Database Connection Errors
 
-**Error:** Database connection failures
+**Error**: Database connection failures
 
 ### Solution
 
@@ -144,7 +144,7 @@ Verify database is running and accessible.
 
 ## Project Creation Errors
 
-**Error:** `Directory already exists`
+**Error**: `Directory already exists`
 
 ### Solution
 
@@ -157,7 +157,7 @@ fastappkit core new myproject
 
 ## Settings Not Found
 
-**Error:** Settings-related errors when running CLI commands
+**Error**: Settings-related errors when running CLI commands
 
 ### Solution
 
@@ -172,7 +172,7 @@ Verify `core/config.py` exists and contains a `Settings` class.
 
 ## App Not Found in Registry
 
-**Error:** `App 'blog' not found in registry`
+**Error**: `App 'blog' not found in registry`
 
 ### Solution
 
@@ -183,7 +183,7 @@ Verify `core/config.py` exists and contains a `Settings` class.
 
 ## Migration Directory Not Found
 
-**Error:** `Core migrations directory not found`
+**Error**: `Core migrations directory not found`
 
 ### Solution
 
@@ -195,25 +195,44 @@ ls -la core/db/migrations/
 
 If missing, recreate the project or manually create the directory structure.
 
-## Import Errors in Apps
+## External App Not Pip-Installed
 
-**Error:** `ModuleNotFoundError` or import errors when loading apps
-
-### Common Causes
-
-- Missing `__init__.py` files
-- Incorrect Python path
-- Missing dependencies
-- Circular imports
+**Error**: `AppLoadError: Could not resolve app entry`
 
 ### Solution
 
-- Ensure all app directories have `__init__.py`
-- Check that dependencies are installed
-- Verify Python path includes project root
-- Review import statements for circular dependencies
+External apps must be pip-installed (even for local development):
+
+```bash
+pip install -e /path/to/external/app
+```
+
+Then add to `fastappkit.toml` as package name (not path).
+
+## Duplicate App Names
+
+**Warning**: `Duplicate app names detected`
+
+### Solution
+
+Rename one of the apps or check if multiple entries resolve to same name:
+
+```bash
+fastappkit app list  # Check resolved names
+```
+
+## Route Not Accessible
+
+**Problem**: Routes return 404
+
+### Solution
+
+1. Check app is in `fastappkit.toml`
+2. Verify `register()` returns `APIRouter` (for auto-mount)
+3. Check `route_prefix` in manifest
+4. Verify app loaded: `fastappkit app list`
 
 ## Learn More
 
-- [Debugging](debugging.md) - Debugging techniques
-- [CLI Reference](../reference/cli-reference.md) - Command options and usage
+-   [Debugging](debugging.md) - Debugging techniques
+-   [CLI Reference](../reference/cli-reference.md) - All commands

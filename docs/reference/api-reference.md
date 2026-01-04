@@ -1,49 +1,120 @@
 # API Reference
 
-Programmatic API reference for fastappkit.
+Programmatic API documentation for fastappkit.
 
-## Core API
+## FastAppKit Class
 
-### FastAppKit
+Main class that manages settings and app loading.
 
-Main class for creating FastAPI applications.
+### `FastAppKit.__init__`
+
+Initialize FastAppKit with settings.
+
+**Signature:**
 
 ```python
-from fastappkit.core.kit import FastAppKit
+def __init__(self, settings: SettingsProtocol) -> None
+```
+
+**Parameters:**
+
+-   `settings`: Settings instance from project's `core.config` module
+
+**Example:**
+
+```python
 from core.config import Settings
+from fastappkit.core.kit import FastAppKit
+
+settings = Settings()
+kit = FastAppKit(settings=settings)
+```
+
+**Notes:**
+
+-   Calls `set_settings()` internally to make settings globally available
+-   Settings must implement `SettingsProtocol` (have `database_url` and `debug`)
+
+### `FastAppKit.create_app`
+
+Create and configure FastAPI application.
+
+**Signature:**
+
+```python
+def create_app(self) -> FastAPI
+```
+
+**Returns:**
+
+-   `FastAPI`: Configured FastAPI application
+
+**Example:**
+
+```python
+from core.config import Settings
+from fastappkit.core.kit import FastAppKit
 
 settings = Settings()
 kit = FastAppKit(settings=settings)
 app = kit.create_app()
 ```
 
-#### Methods
+**What it does:**
 
-**`create_app() -> FastAPI`**
+1. Creates FastAPI app instance
+2. Loads apps via `AppLoader`
+3. Executes app registrations
+4. Mounts routers
+5. Returns configured app
 
-Create and configure FastAPI application.
+## Settings Functions
 
--   Loads all apps from `fastappkit.toml`
--   Validates app manifests
--   Mounts routers with automatic prefixes
--   Returns configured FastAPI application
+### `get_settings`
 
-## Settings API
+Get the global settings instance.
 
-### get_settings()
+**Signature:**
 
-Get the current settings instance.
+```python
+def get_settings() -> SettingsProtocol
+```
+
+**Returns:**
+
+-   `SettingsProtocol`: Current settings instance
+
+**Example:**
 
 ```python
 from fastappkit.conf import get_settings
 
 settings = get_settings()
 db_url = settings.database_url
+is_debug = settings.debug
 ```
 
-### set_settings()
+**Notes:**
+
+-   Returns the settings instance set by `FastAppKit.__init__`
+-   Raises error if settings not initialized
+-   Django-like global accessor pattern
+
+### `set_settings`
 
 Set the global settings instance.
+
+**Signature:**
+
+```python
+def set_settings(settings: SettingsProtocol) -> None
+```
+
+**Parameters:**
+
+-   `settings`: Settings instance to set globally
+
+**Example:**
 
 ```python
 from fastappkit.conf import set_settings
@@ -53,150 +124,146 @@ settings = Settings()
 set_settings(settings)
 ```
 
-### ensure_settings_loaded()
+**Notes:**
 
-Ensure settings are loaded from project.
+-   Called automatically by `FastAppKit.__init__`
+-   Usually not called directly
+
+## Settings Protocol
+
+Protocol that settings classes must implement.
+
+### `SettingsProtocol`
 
 ```python
-from fastappkit.conf import ensure_settings_loaded
-from pathlib import Path
-
-project_root = Path.cwd()
-ensure_settings_loaded(project_root)
+class SettingsProtocol(Protocol):
+    database_url: str
+    debug: bool
 ```
 
-## App Loading API
+**Required Attributes:**
 
-### AppLoader
+-   `database_url: str` - Database connection string
+-   `debug: bool` - Debug mode flag
 
-Load and register apps from configuration.
+**Example Implementation:**
 
 ```python
-from fastappkit.core.loader import AppLoader
-from pathlib import Path
+from pydantic_settings import BaseSettings
+from fastappkit.conf import SettingsProtocol
 
-project_root = Path.cwd()
-loader = AppLoader(project_root)
-registry = loader.load_all()
+class Settings(BaseSettings, SettingsProtocol):
+    database_url: str = "sqlite:///./app.db"
+    debug: bool = False
 ```
 
-#### Methods
+## App Registration
 
-**`load_all() -> AppRegistry`**
+### Register Function Signature
 
-Load all apps from `fastappkit.toml` and return registry.
+Apps provide a `register()` function:
 
-### AppRegistry
-
-Registry of loaded apps.
+**Signature:**
 
 ```python
-from fastappkit.core.registry import AppRegistry, AppMetadata
-
-registry: AppRegistry = loader.load_all()
-
-# Get app metadata
-app_metadata: AppMetadata = registry.get("blog")
-
-# Check if app exists
-if "blog" in registry:
-    ...
-
-# Iterate over apps
-for name, metadata in registry.items():
-    ...
+def register(app: FastAPI) -> APIRouter | None:
+    """Register this app with the FastAPI application."""
+    return router  # or None
 ```
 
-## Manifest API
+**Parameters:**
 
-### ManifestLoader
+-   `app`: FastAPI application instance
 
-Load app manifests.
+**Returns:**
+
+-   `APIRouter | None`: Return router for auto-mount, or `None` for manual mount
+
+**Example:**
 
 ```python
-from fastappkit.core.manifest import ManifestLoader
+from fastapi import APIRouter, FastAPI
+from fastappkit.conf import get_settings
 
-loader = ManifestLoader()
-manifest = loader.load("blog")
+router = APIRouter()
+
+@router.get("/posts")
+def list_posts():
+    return []
+
+def register(app: FastAPI) -> APIRouter:
+    settings = get_settings()
+    return router  # Auto-mount
 ```
 
-## Validation API
+## Programmatic Usage Examples
 
-### ManifestValidator
-
-Validate app manifests.
+### Basic Usage
 
 ```python
-from fastappkit.validation.manifest import ManifestValidator, ValidationResult
+# core/app.py
+from core.config import Settings
+from fastappkit.core.kit import FastAppKit
 
-validator = ManifestValidator()
-result: ValidationResult = validator.validate(manifest_data)
-
-if result.is_valid:
-    print("Manifest is valid")
-else:
-    for error in result.errors:
-        print(f"Error: {error}")
+settings = Settings()
+kit = FastAppKit(settings=settings)
+app = kit.create_app()
 ```
 
-### IsolationValidator
-
-Validate app isolation rules.
+### Custom FastAPI App
 
 ```python
-from fastappkit.validation.isolation import IsolationValidator, ValidationResult
+from core.config import Settings
+from fastappkit.core.kit import FastAppKit
+from fastapi import FastAPI
 
-validator = IsolationValidator()
-result: ValidationResult = validator.validate(app_metadata)
+settings = Settings()
+kit = FastAppKit(settings=settings)
+app = kit.create_app()
 
-if not result.is_valid:
-    for error in result.errors:
-        print(f"Isolation violation: {error}")
+# Customize app
+app.title = "My Custom API"
+app.version = "1.0.0"
 ```
 
-### MigrationValidator
-
-Validate migration configuration.
+### Subclassing FastAppKit
 
 ```python
-from fastappkit.validation.migrations import MigrationValidator, ValidationResult
+from fastappkit.core.kit import FastAppKit
+from fastapi import FastAPI
+from core.config import Settings
 
-validator = MigrationValidator()
-result: ValidationResult = validator.validate(app_metadata)
+class CustomFastAppKit(FastAppKit):
+    def create_app(self) -> FastAPI:
+        app = super().create_app()
+        # Add custom middleware, exception handlers, etc.
+        app.title = "My Custom API"
+        return app
 
-if not result.is_valid:
-    for error in result.errors:
-        print(f"Migration error: {error}")
+settings = Settings()
+kit = CustomFastAppKit(settings=settings)
+app = kit.create_app()
 ```
 
-## Migration API
-
-### MigrationRunner
-
-Run migrations.
+### Using Settings in Routes
 
 ```python
-from fastappkit.migrations.runner import MigrationRunner
-from fastappkit.core.registry import AppMetadata
+from fastappkit.conf import get_settings
+from fastapi import APIRouter, Depends
+from core.config import Settings
 
-runner = MigrationRunner()
-runner.upgrade_all()  # Run all migrations
-runner.upgrade_app(app_metadata)  # Run app migrations
-```
+router = APIRouter()
 
-### MigrationPreview
-
-Preview migration SQL.
-
-```python
-from fastappkit.migrations.preview import MigrationPreview
-
-preview = MigrationPreview()
-sql = preview.preview(app_metadata, revision="head")
-print(sql)
+@router.get("/config")
+def get_config(settings: Settings = Depends(get_settings)):
+    return {
+        "debug": settings.debug,
+        "database": settings.database_url
+    }
 ```
 
 ## Learn More
 
--   [Architecture](../advanced/architecture.md) - System architecture
--   [Extending fastappkit](../advanced/extending-fastappkit.md) - Extension guide
+-   [Configuration](../configuration/settings.md) - Settings configuration guide
+-   [Creating Apps](../guides/creating-apps.md) - App registration guide
+-   [Extending FastAppKit](../advanced/extending-fastappkit.md) - Customization guide

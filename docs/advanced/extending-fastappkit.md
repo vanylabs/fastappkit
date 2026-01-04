@@ -1,12 +1,10 @@
-# Extending fastappkit
+# Extending FastAppKit
 
-This guide covers extending fastappkit functionality.
+How to customize and extend fastappkit for your needs.
 
-## Customizing FastAppKit
+## Subclassing FastAppKit
 
-### Subclassing FastAppKit
-
-You can subclass `FastAppKit` to customize app creation:
+Customize the FastAPI app creation:
 
 ```python
 from fastappkit.core.kit import FastAppKit
@@ -18,7 +16,14 @@ class CustomFastAppKit(FastAppKit):
         app = super().create_app()
 
         # Add custom middleware
-        app.add_middleware(...)
+        from fastapi.middleware.cors import CORSMiddleware
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
         # Customize app metadata
         app.title = "My Custom API"
@@ -26,18 +31,21 @@ class CustomFastAppKit(FastAppKit):
         app.description = "Custom API description"
 
         # Add exception handlers
-        app.add_exception_handler(...)
+        @app.exception_handler(ValueError)
+        async def value_error_handler(request, exc):
+            return {"error": str(exc)}
 
         return app
 
+# Use custom class
 settings = Settings()
 kit = CustomFastAppKit(settings=settings)
 app = kit.create_app()
 ```
 
-### Custom App Loaders
+## Custom App Loading
 
-You can create custom app loaders:
+Override app loading behavior:
 
 ```python
 from fastappkit.core.loader import AppLoader
@@ -47,79 +55,89 @@ class CustomAppLoader(AppLoader):
     def load_all(self) -> AppRegistry:
         registry = super().load_all()
 
-        # Custom processing
+        # Custom logic: filter apps, modify metadata, etc.
         # ...
 
         return registry
 ```
 
-## Custom Validation
+## Custom Router Assembly
 
-### Custom Validators
-
-Create custom validators:
+Customize router mounting:
 
 ```python
-from fastappkit.validation.manifest import ValidationResult
+from fastappkit.core.router import RouterAssembler
+from fastappkit.core.registry import AppRegistry
+from fastapi import FastAPI
 
-class CustomValidator:
-    def validate(self, manifest: dict) -> ValidationResult:
-        result = ValidationResult()
-
-        # Custom validation logic
-        if not manifest.get("custom_field"):
-            result.add_error("custom_field is required")
-
-        return result
+class CustomRouterAssembler(RouterAssembler):
+    def assemble(self, app: FastAPI, registry: AppRegistry) -> None:
+        # Custom mounting logic
+        for app_metadata in registry.list():
+            if app_metadata.router:
+                # Custom prefix logic
+                prefix = self._custom_prefix(app_metadata)
+                app.include_router(app_metadata.router, prefix=prefix)
 ```
 
-## Custom Migration Handlers
+## Middleware and Exception Handlers
 
-### Custom Migration Runner
-
-Extend the migration runner:
+Add middleware and exception handlers in `core/app.py`:
 
 ```python
-from fastappkit.migrations.runner import MigrationRunner
+from core.config import Settings
+from fastappkit.core.kit import FastAppKit
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+import time
 
-class CustomMigrationRunner(MigrationRunner):
-    def upgrade_all(self) -> None:
-        # Custom pre-upgrade logic
-        self.before_upgrade()
+settings = Settings()
+kit = FastAppKit(settings=settings)
+app = kit.create_app()
 
-        # Run standard upgrade
-        super().upgrade_all()
+# Add middleware
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
-        # Custom post-upgrade logic
-        self.after_upgrade()
-
-    def before_upgrade(self) -> None:
-        # Custom logic
-        pass
-
-    def after_upgrade(self) -> None:
-        # Custom logic
-        pass
+# Add exception handlers
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    return JSONResponse(
+        status_code=400,
+        content={"error": str(exc)}
+    )
 ```
 
-## Plugin System
+## Custom Settings Access
 
-While fastappkit doesn't have a formal plugin system yet, you can:
+Create custom settings accessors:
 
-1. Create external apps that extend functionality
-2. Use the settings system for configuration
-3. Hook into app loading via custom loaders
-4. Extend migration system via custom runners
+```python
+from fastappkit.conf import get_settings
+from core.config import Settings
 
-## Best Practices
+def get_database_url() -> str:
+    """Custom accessor for database URL."""
+    settings = get_settings()
+    return settings.database_url
 
-1. **Follow Isolation Rules:** Ensure your extensions respect app isolation
-2. **Validate Inputs:** Always validate configuration and inputs
-3. **Error Handling:** Provide clear error messages
-4. **Documentation:** Document your extensions thoroughly
-5. **Testing:** Test extensions thoroughly
+# Use in routes
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/db-info")
+def db_info():
+    db_url = get_database_url()
+    return {"database": db_url}
+```
 
 ## Learn More
 
-- [Architecture](architecture.md) - Understanding the system
-- [Best Practices](best-practices.md) - Development best practices
+-   [Best Practices](best-practices.md) - Recommended patterns
+-   [Architecture](architecture.md) - Internal architecture

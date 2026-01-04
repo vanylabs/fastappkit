@@ -1,57 +1,56 @@
 # Configuration Reference
 
-Complete reference for fastappkit configuration options.
+Quick lookup for all fastappkit configuration options.
 
-## Project Configuration
+## Project Configuration (`fastappkit.toml`)
 
-fastappkit uses `fastappkit.toml` for project configuration. This file is separate from `pyproject.toml`.
+### Location
 
-### Basic Structure
+Project root (where you run `fastappkit` commands).
+
+### Schema
 
 ```toml
 [tool.fastappkit]
 apps = [
-  "apps.blog",           # Internal app
-  "apps.auth",           # Internal app
-  "fastapi_payments",    # External app (pip-installed package)
+  "apps.blog",        # Internal app
+  "fastapi_payments", # External app
 ]
+
+[tool.fastappkit.migration]
+order = ["core", "auth", "blog"]  # Optional: override internal app order
 ```
+
+### Options
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `apps` | `array[string]` | Yes | `[]` | List of app entries |
+| `migration.order` | `array[string]` | No | apps order | Migration execution order (internal apps only) |
 
 ### App Entry Formats
 
--   `apps.<name>` → Internal app (located in `./apps/<name>/`)
--   `<package_name>` → External app (pip-installed package, must be importable)
+-   **Internal app**: `apps.<name>` (resolves to `./apps/<name>/`)
+-   **External app**: `<package_name>` (must be pip-installed, importable)
 
-### Migration Order
+## Settings Configuration (`core/config.py`)
 
-Override the order in which internal app migrations are applied:
+### Required Settings
 
-```toml
-[tool.fastappkit.migration]
-order = ["core", "auth", "blog"]
-```
+| Setting | Type | Required | Default | Env Var | Description |
+|---------|------|----------|---------|---------|-------------|
+| `database_url` | `str` | Yes | `sqlite:///./app.db` | `DATABASE_URL` | Database connection string |
+| `debug` | `bool` | Yes | `False` | `DEBUG` | Debug mode flag |
 
-If not specified, internal apps are processed in the order they appear in the `apps` list.
-
-## Settings Configuration
-
-Settings are defined in `core/config.py` using Pydantic's `BaseSettings`.
-
-### Basic Settings
+### Settings Class Structure
 
 ```python
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    database_url: str = Field(
-        default="sqlite:///./app.db",
-        alias="DATABASE_URL"
-    )
-    debug: bool = Field(
-        default=False,
-        alias="DEBUG"
-    )
+    database_url: str = Field(default="sqlite:///./app.db", alias="DATABASE_URL")
+    debug: bool = Field(default=False, alias="DEBUG")
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -60,76 +59,133 @@ class Settings(BaseSettings):
     )
 ```
 
-### Extended Settings
+### Common Custom Settings
+
+-   `secret_key: str` - Secret key for encryption/signing
+-   `host: str` - Server host
+-   `port: int` - Server port
+-   `redis_url: str` - Redis connection string
+-   `email_settings: EmailConfig` - Nested email configuration
+-   `logging_level: str` - Logging verbosity
+
+### Environment Variables
+
+-   **Location**: `.env` file in project root
+-   **Format**: `KEY=value` (uppercase with underscores)
+-   **Precedence**: Environment variables > `.env` file > defaults
+
+## External App Manifest (`<app>/<app>/fastappkit.toml`)
+
+### Location
+
+Package directory (`<app_name>/<app_name>/fastappkit.toml`).
+
+### Schema
+
+```toml
+[tool.fastappkit]
+name = "payments"
+version = "0.1.0"
+entrypoint = "payments:register"
+migrations = "migrations"
+models_module = "payments.models"
+route_prefix = "/payments"
+```
+
+### Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `name` | `string` | Yes | - | App name (must match package) |
+| `version` | `string` | Yes | - | Semantic version |
+| `entrypoint` | `string` | Yes | - | Dotted path to register function |
+| `migrations` | `string` | Yes | - | Path to migrations directory |
+| `models_module` | `string` | Recommended | - | Dotted path to models module |
+| `route_prefix` | `string` | No | `/<appname>` | Router mount prefix |
+
+### Entrypoint Formats
+
+-   `"module:function"` - Function in module (e.g., `"payments:register"`)
+-   `"module:Class"` - Class with `register` method (e.g., `"payments:App"`)
+-   Defaults to `"module:register"` if just module name
+
+## Quick Reference Tables
+
+### Project Configuration Options
+
+| Section | Option | Type | Required | Description |
+|---------|--------|------|----------|-------------|
+| `[tool.fastappkit]` | `apps` | `array[string]` | Yes | List of apps |
+| `[tool.fastappkit.migration]` | `order` | `array[string]` | No | Internal app migration order |
+
+### Settings Options
+
+| Setting | Type | Required | Default | Env Var |
+|---------|------|----------|---------|---------|
+| `database_url` | `str` | Yes | `sqlite:///./app.db` | `DATABASE_URL` |
+| `debug` | `bool` | Yes | `False` | `DEBUG` |
+
+### Manifest Fields
+
+| Field | Type | Required | Default |
+|-------|------|----------|---------|
+| `name` | `string` | Yes | - |
+| `version` | `string` | Yes | - |
+| `entrypoint` | `string` | Yes | - |
+| `migrations` | `string` | Yes | - |
+| `models_module` | `string` | Recommended | - |
+| `route_prefix` | `string` | No | `/<appname>` |
+
+## Examples
+
+### Complete Project Configuration
+
+```toml
+[tool.fastappkit]
+apps = [
+  "apps.blog",
+  "apps.auth",
+  "fastapi_payments",
+]
+
+[tool.fastappkit.migration]
+order = ["core", "auth", "blog"]
+```
+
+### Complete Settings Configuration
 
 ```python
 from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    database_url: str = Field(
-        default="sqlite:///./app.db",
-        alias="DATABASE_URL"
-    )
-    debug: bool = Field(
-        default=False,
-        alias="DEBUG"
-    )
+    database_url: str = Field(default="sqlite:///./app.db", alias="DATABASE_URL")
+    debug: bool = Field(default=False, alias="DEBUG")
 
-    # Custom settings
-    secret_key: str = Field(
-        default="change-me-in-production",
-        alias="SECRET_KEY"
-    )
-    host: str = Field(default="127.0.0.1", alias="HOST")
-    port: int = Field(default=8000, alias="PORT")
-
-    # Nested settings
-    class DatabaseConfig(BaseSettings):
-        host: str = "localhost"
-        port: int = 5432
-        name: str = "mydb"
-
-    database: DatabaseConfig = DatabaseConfig()
+    secret_key: str = Field(default="", alias="SECRET_KEY")
+    redis_url: str = Field(default="redis://localhost:6379", alias="REDIS_URL")
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        populate_by_name=True,
-        extra="ignore",
+        populate_by_name=True
     )
 ```
 
-### Settings Options
+### Complete Manifest Configuration
 
-**BaseSettings Configuration:**
-
--   `env_file`: Path to `.env` file (default: `.env`)
--   `env_file_encoding`: Encoding for `.env` file (default: `utf-8`)
--   `case_sensitive`: Whether environment variable names are case-sensitive (default: `False`)
--   `extra`: How to handle extra fields (`"ignore"`, `"forbid"`, `"allow"`)
-
-### Environment Variables
-
-Settings are loaded from `.env` file and environment variables:
-
-```bash
-# .env
-DATABASE_URL=postgresql://user:password@localhost:5432/mydb
-DEBUG=false
-SECRET_KEY=your-secret-key-here
+```toml
+[tool.fastappkit]
+name = "payments"
+version = "0.1.0"
+entrypoint = "payments:register"
+migrations = "migrations"
+models_module = "payments.models"
+route_prefix = "/api/payments"
 ```
-
-Environment variables take precedence over `.env` file values.
-
-## External App Manifest
-
-External apps must declare metadata in `fastappkit.toml` located inside the package directory.
-
-**Location:** `<app_name>/<app_name>/fastappkit.toml`
-
-See the [Manifest Reference](manifest-reference.md) for complete details.
 
 ## Learn More
 
--   [Configuration Guide](../guides/configuration.md) - Configuration guide
--   [Manifest Reference](manifest-reference.md) - External app manifest schema
+-   [Project Configuration](../configuration/project-config.md) - Complete `fastappkit.toml` reference
+-   [Settings Configuration](../configuration/settings.md) - Complete `core/config.py` guide
+-   [External App Manifest](../configuration/external-app-manifest.md) - Manifest format reference

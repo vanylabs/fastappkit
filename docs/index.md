@@ -4,96 +4,45 @@
 
 ## What is fastappkit?
 
-fastappkit is a toolkit for building FastAPI projects with a modular app architecture. It enables:
+fastappkit enables you to organize your FastAPI code into logical, reusable components—both within your project and as installable packages. It provides:
 
--   **Internal apps** — project-specific feature modules (like Django apps)
--   **External apps** — reusable, pluggable packages (like WordPress plugins)
--   **Unified migrations** — coordinated database schema management
--   **Automatic router mounting** — seamless integration of app routes
--   **App validation and isolation** — ensure apps don't conflict with each other
+-   **Internal apps**: Project-specific modules (like Django apps) that live in your `apps/` directory
+-   **External apps**: Reusable packages you can install via pip and plug into any fastappkit project
 
-## Why fastappkit?
-
-Building large FastAPI applications often means either cramming everything into a single file or manually organizing modules without clear conventions. fastappkit solves this by introducing a structured app system where you can organize your code into logical, reusable components—both within your project and as installable packages.
-
-Whether you're building a monolith that needs better organization or creating reusable components for multiple projects, fastappkit provides the structure and tooling to make it happen.
-
-## Who can use this?
-
--   **FastAPI developers** building applications that are outgrowing a single-file structure
--   **Teams** that need consistent project organization across multiple developers
--   **Developers** creating reusable FastAPI components they want to share
--   **Anyone** who appreciates Django's app system but prefers FastAPI's performance and modern Python features
+Both types get automatic router mounting, unified migration management, and validation to prevent conflicts.
 
 ## Key Features
 
-fastappkit provides several important capabilities:
-
-**Project Structure**
-
--   Clean project layout with automatic app discovery
--   Consistent organization that scales as your project grows
-
-**Migration Management**
-
--   Shared migrations for internal apps
--   Isolated migrations for external apps
--   Coordinated execution order
-
-**Router Integration**
-
--   Automatic router mounting with configurable prefixes
--   Seamless route integration without manual wiring
-
-**Validation & Safety**
-
--   Fail-fast validation and error handling
--   App isolation checks to prevent conflicts
--   Manifest validation for external apps
-
-**Workflow Support**
-
--   Works with both monorepo and multi-repo workflows
--   Simple CLI for project and app management
+-   **Modular Architecture**: Organize code into apps (internal and external)
+-   **Automatic Router Mounting**: Apps register routes automatically
+-   **Unified Migrations**: Coordinated database schema management
+-   **App Isolation**: Validation ensures apps don't conflict
+-   **CLI Tools**: Simple commands for project and app management
+-   **Settings Management**: Django-like settings system with environment variables
 
 ## Quick Start
 
-Get started with fastappkit in minutes:
-
-### 1. Create a new project
+Get started in minutes:
 
 ```bash
+# Install
+pip install fastappkit
+
+# Create a new project
 fastappkit core new myproject
 cd myproject
-```
 
-This creates a complete FastAPI project structure with core application setup, database configuration, migration system, and app directory structure.
-
-### 2. Create an internal app
-
-```bash
+# Create an app
 fastappkit app new blog
-```
 
-This creates a new internal app in `apps/blog/` with models, router, and registers it in `fastappkit.toml`.
-
-### 3. Run migrations
-
-```bash
+# Run migrations
 fastappkit migrate all
-```
 
-This runs all migrations in the correct order: core → internal apps → external apps.
-
-### 4. Start the development server
-
-```bash
+# Start development server
 fastappkit core dev
 ```
 
-Your FastAPI application is now running at `http://127.0.0.1:8000`!
-
-For detailed installation instructions, see the [Installation Guide](getting-started/installation.md).
+Your FastAPI app is now running at `http://127.0.0.1:8000` with routes mounted at `/blog/`.
 
 ## Documentation Overview
 
@@ -103,13 +52,33 @@ For detailed installation instructions, see the [Installation Guide](getting-sta
 -   [Quick Start](getting-started/quickstart.md) - Create your first project
 -   [Core Concepts](getting-started/core-concepts.md) - Understand internal and external apps
 
+### Usage Scenarios
+
+-   [Usage Overview](usage/index.md) - Choose your development path
+-   [Scaffolding Only](usage/scaffolding-only.md) - Just project structure
+-   [Internal Apps](usage/internal-apps.md) - Build with internal apps
+-   [Full Ecosystem](usage/full-ecosystem.md) - Internal + external apps
+
+### Configuration
+
+-   [Configuration Overview](configuration/index.md) - All configuration options
+-   [Project Configuration](configuration/project-config.md) - `fastappkit.toml` reference
+-   [Settings](configuration/settings.md) - `core/config.py` guide
+-   [External App Manifest](configuration/external-app-manifest.md) - Manifest format
+
 ### Guides
 
 -   [Creating Projects](guides/creating-projects.md) - Set up new fastappkit projects
 -   [Creating Apps](guides/creating-apps.md) - Build internal and external apps
 -   [Migrations](guides/migrations.md) - Manage database schema changes
--   [Configuration](guides/configuration.md) - Configure your projects
+-   [Development Workflow](guides/development-workflow.md) - Day-to-day development
 -   [Deployment](guides/deployment.md) - Deploy fastappkit applications
+
+### Reference
+
+-   [CLI Reference](reference/cli-reference.md) - All available commands
+-   [Configuration Reference](reference/configuration-reference.md) - Complete config options
+-   [API Reference](reference/api-reference.md) - Programmatic API
 
 ### Topics
 
@@ -118,13 +87,6 @@ For detailed installation instructions, see the [Installation Guide](getting-sta
 -   [Migration System](topics/migration-system.md) - How migrations work
 -   [App Isolation](topics/app-isolation.md) - Ensuring apps don't conflict
 -   [Router Mounting](topics/router-mounting.md) - Automatic route integration
-
-### Reference
-
--   [CLI Reference](reference/cli-reference.md) - All available commands
--   [Configuration Reference](reference/configuration-reference.md) - Configuration options
--   [Manifest Reference](reference/manifest-reference.md) - App manifest format
--   [API Reference](reference/api-reference.md) - Programmatic API
 
 ### Advanced
 
@@ -137,62 +99,19 @@ For detailed installation instructions, see the [Installation Guide](getting-sta
 -   [Common Issues](troubleshooting/common-issues.md) - Solutions to frequent problems
 -   [Debugging](troubleshooting/debugging.md) - Debugging techniques
 
-## Core Concepts
+## Who is this for?
 
-### Internal Apps
-
-Internal apps are project-specific modules that live in your project's `apps/` directory. They share the same migration system and database connection.
-
-**Key points:**
-
--   Internal apps import `Base` from `core.models` for SQLAlchemy models
--   The `register()` function can return `Optional[APIRouter]` - return a router for fastappkit to mount, or mount it yourself and return `None`
-
-### External Apps
-
-External apps are reusable packages that can be installed via pip and plugged into any fastappkit project.
-
-**Key points:**
-
--   External apps must use their own `Base` class (isolated metadata) - cannot import from core
--   The `register()` function can return `Optional[APIRouter]` - return a router for fastappkit to mount, or mount it yourself and return `None`
--   External apps must have `fastappkit.toml` manifest in the package directory
-
-### Migrations
-
-fastappkit provides unified migration management:
-
--   **Core migrations**: Project-level schema changes
--   **Internal app migrations**: Shared migration directory for all internal apps
--   **External app migrations**: Isolated migrations per external app
-
-## Example Project Structure
-
-```
-myproject/
-├── core/
-│   ├── config.py          # Settings (loads from .env)
-│   ├── models.py          # SQLAlchemy Base class (DeclarativeBase)
-│   ├── app.py             # create_app() factory
-│   └── db/
-│       └── migrations/    # Core migrations
-├── apps/                  # Internal apps directory
-│   └── blog/
-│       ├── models.py      # Imports Base from core.models
-│       └── router.py
-├── fastappkit.toml        # Project configuration
-├── .env                   # Environment variables
-└── main.py                # Entry point
-```
+-   **FastAPI developers** building applications that are outgrowing a single-file structure
+-   **Teams** that need consistent project organization across multiple developers
+-   **Developers** creating reusable FastAPI components they want to share
+-   **Anyone** who appreciates Django's app system but prefers FastAPI's performance and modern Python features
 
 ## Community
-
-fastappkit is an open-source project. We welcome contributions and value our community.
 
 -   [Contributing](community/index.md#contributing) - How to contribute
 -   [Code of Conduct](community/index.md#code-of-conduct) - Community standards
 -   [Security Policy](community/index.md#security-policy) - Reporting vulnerabilities
--   [License](community/index.md#license) - MIT License
+-   [Changelog](changelog/0.2.1.md) - Version history (see [Changelog section](changelog/0.2.1.md) for all versions)
 
 ## Support
 
@@ -202,5 +121,4 @@ fastappkit is an open-source project. We welcome contributions and value our com
 
 ## Acknowledgments
 
--   Inspired by Django's app system
--   Built with [FastAPI](https://fastapi.tiangolo.com/), [SQLAlchemy](https://www.sqlalchemy.org/), [Alembic](https://alembic.sqlalchemy.org/), and [Typer](https://typer.tiangolo.com/)
+Inspired by Django's app system. Built with [FastAPI](https://fastapi.tiangolo.com/), [SQLAlchemy](https://www.sqlalchemy.org/), [Alembic](https://alembic.sqlalchemy.org/), and [Typer](https://typer.tiangolo.com/).
