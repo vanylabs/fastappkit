@@ -37,6 +37,7 @@ cd payments
 ```
 
 This creates a complete external app structure:
+
 -   `payments/payments/` (package directory)
 -   `payments/payments/fastappkit.toml` (manifest)
 -   `payments/payments/migrations/` (isolated migrations)
@@ -114,6 +115,7 @@ This uses the external app's `.env` and `DATABASE_URL`.
 #### Step 6: Publish or Use Locally
 
 When ready:
+
 -   Publish to PyPI, or
 -   Use locally with `pip install -e /path/to/payments`
 
@@ -223,6 +225,7 @@ apps = [
 #### Step 7: Develop Both Together
 
 You can now:
+
 -   Edit core project code
 -   Edit external app code
 -   Test both together
@@ -348,6 +351,16 @@ curl http://127.0.0.1:8000/payments/
 curl http://127.0.0.1:8000/blog/posts
 curl http://127.0.0.1:8000/payments/transactions
 ```
+
+## Example Project
+
+For a complete working example of the full ecosystem approach, check out the **[Modular Tasks Platform](https://github.com/vanylabs/modular-task-manager)**. This project demonstrates:
+
+-   Core application with internal apps (tasks module)
+-   External apps (authentication and notes modules)
+-   Frontend integration with React
+-   Docker setup for easy development
+-   Complete workflow from development to deployment
 
 ## Next Steps
 

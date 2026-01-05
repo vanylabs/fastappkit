@@ -89,6 +89,7 @@ Now that you have a working project:
 -   Explore the [Migration System](../topics/migration-system.md) for database management
 -   Check the [CLI Reference](../reference/cli-reference.md) for all available commands
 -   See [Usage Scenarios](../usage/index.md) for different development approaches
+-   Check out the [Modular Tasks Platform](https://github.com/vanylabs/modular-task-manager) example project to see fastappkit in action
 
 ## Important Notes
 

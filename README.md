@@ -50,6 +50,12 @@ fastappkit core dev
 
 That's it. Your FastAPI app is running at `http://127.0.0.1:8000` with routes mounted at `/blog/`.
 
+## Examples
+
+See fastappkit in action with real-world examples:
+
+-   **[Modular Tasks Platform](https://github.com/vanylabs/modular-task-manager)** - A complete example showcasing internal and external apps working together. Features authentication, task management, and notes modules, demonstrating how to build modular FastAPI applications with fastappkit.
+
 ## Documentation
 
 Full documentation is available at **[fastappkit.readthedocs.io](https://fastappkit.readthedocs.io/)**.
